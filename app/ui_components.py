@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from html import escape
 
 import pandas as pd
 import streamlit as st
@@ -186,6 +187,79 @@ def inject_professional_theme() -> None:
                 font-size: 1.2rem;
                 font-weight: 700;
                 margin: 0.2rem 0 0;
+            }
+            .chat-shell {
+                border: 1px solid #dbe4f0;
+                border-radius: 20px;
+                background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+                padding: 1rem;
+                box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+            }
+            .chat-toolbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.6rem;
+                margin-bottom: 0.7rem;
+                padding-bottom: 0.7rem;
+                border-bottom: 1px solid #e5edf6;
+            }
+            .chat-title {
+                margin: 0;
+                color: #0f172a;
+                font-weight: 700;
+                font-size: 1.05rem;
+            }
+            .chat-subtitle {
+                margin: 0.15rem 0 0;
+                color: #64748b;
+                font-size: 0.85rem;
+            }
+            .prompt-chip {
+                display: inline-block;
+                background: #eef4ff;
+                border: 1px solid #dbe7ff;
+                color: #1e3a8a;
+                border-radius: 999px;
+                padding: 0.3rem 0.65rem;
+                font-size: 0.78rem;
+                margin: 0.15rem 0.25rem 0.25rem 0;
+                font-weight: 600;
+            }
+            .chat-history-card {
+                border: 1px solid #e2e8f0;
+                background: #ffffff;
+                border-radius: 16px;
+                padding: 0.75rem;
+                max-height: 420px;
+                overflow-y: auto;
+                margin-top: 0.65rem;
+            }
+            .chat-bubble {
+                border-radius: 14px;
+                padding: 0.65rem 0.75rem;
+                margin-bottom: 0.55rem;
+            }
+            .chat-bubble.user {
+                background: #eff6ff;
+                border: 1px solid #dbeafe;
+            }
+            .chat-bubble.assistant {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+            }
+            .chat-role {
+                margin: 0 0 0.2rem;
+                font-size: 0.78rem;
+                font-weight: 700;
+                letter-spacing: 0.02em;
+                text-transform: uppercase;
+                color: #334155;
+            }
+            .chat-copy {
+                margin: 0;
+                color: #0f172a;
+                line-height: 1.5;
             }
             div[data-testid="stMetric"] {
                 background: #ffffff;
@@ -499,28 +573,80 @@ def render_evaluation_strip() -> None:
 
 def render_chat_panel() -> None:
     st.markdown("### Clinical Q&A Dialogue")
-    query = st.text_input(
-        "Ask follow-up questions",
-        placeholder="Why was this recommended? What changes if sugar is reduced? Explain in simple terms.",
+    st.markdown(
+        """
+        <div class="chat-shell">
+            <div class="chat-toolbar">
+                <div>
+                    <p class="chat-title">Follow-up Assistant</p>
+                    <p class="chat-subtitle">Get patient-friendly reasoning and actionable next steps.</p>
+                </div>
+            </div>
+            <span class="prompt-chip">Explain this recommendation in plain language</span>
+            <span class="prompt-chip">How would lower sugar preference change the result?</span>
+            <span class="prompt-chip">What 2 improvements should I prioritize first?</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    if st.button("Ask Assistant", use_container_width=True):
-        if st.session_state.profile and st.session_state.last_prediction:
+    query = st.text_input(
+        "Ask follow-up questions",
+        placeholder="Example: Why this plan? What changes if I increase activity level to high?",
+    )
+
+    c1, c2 = st.columns([4, 1])
+    with c1:
+        ask_clicked = st.button("Ask Assistant", type="primary", use_container_width=True)
+    with c2:
+        clear_clicked = st.button("Clear", use_container_width=True)
+
+    if clear_clicked:
+        st.session_state.chat_history = []
+
+    if ask_clicked:
+        cleaned_query = query.strip()
+        if not cleaned_query:
+            st.info("Please enter a question so I can provide a focused answer.")
+        elif st.session_state.profile and st.session_state.last_prediction:
             response = st.session_state.chatbot.respond(
-                question=query,
+                question=cleaned_query,
                 profile=st.session_state.profile,
                 recommendation=st.session_state.last_prediction,
                 explanation=st.session_state.last_explanation,
                 shap_summary=st.session_state.last_shap_output,
             )
-            st.session_state.chat_history.append((query, response))
-            st.session_state.chat_history = st.session_state.chat_history[-3:]
+            st.session_state.chat_history.append((cleaned_query, response))
+            st.session_state.chat_history = st.session_state.chat_history[-5:]
         else:
             st.warning("Generate a recommendation first.")
 
-    for question, answer in st.session_state.chat_history:
-        st.markdown(f"**You:** {question}")
-        st.markdown(f"**Assistant:** {answer}")
+    if st.session_state.chat_history:
+        st.markdown('<div class="chat-history-card">', unsafe_allow_html=True)
+        for question, answer in reversed(st.session_state.chat_history):
+            safe_question = escape(question)
+            safe_answer = escape(answer)
+            st.markdown(
+                f"""
+                <div class="chat-bubble user">
+                    <p class="chat-role">You</p>
+                    <p class="chat-copy">{safe_question}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f"""
+                <div class="chat-bubble assistant">
+                    <p class="chat-role">Assistant</p>
+                    <p class="chat-copy">{safe_answer}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.info("No conversation yet. Ask a follow-up to begin.")
 
 
 def profile_to_table() -> pd.DataFrame:
