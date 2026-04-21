@@ -25,13 +25,13 @@ def inject_professional_theme() -> None:
     st.markdown(
         """
         <style>
-            .block-container {padding-top: 1.5rem; padding-bottom: 2rem; max-width: 1200px;}
+            .block-container {padding-top: 1.2rem; padding-bottom: 2.4rem; max-width: 1200px;}
             .hero-card {
                 background: linear-gradient(120deg, #0f172a 0%, #1e293b 60%, #334155 100%);
                 color: #f8fafc;
-                border-radius: 16px;
-                padding: 1rem 1.2rem;
-                margin-bottom: 1rem;
+                border-radius: 20px;
+                padding: 1.35rem 1.5rem;
+                margin-bottom: 1.1rem;
                 border: 1px solid rgba(148, 163, 184, 0.35);
             }
             .metric-card {
@@ -39,6 +39,67 @@ def inject_professional_theme() -> None:
                 border: 1px solid #e2e8f0;
                 border-radius: 14px;
                 padding: 0.8rem 1rem;
+            }
+            .section-header {
+                margin: 0.2rem 0 0.85rem;
+                font-size: 2rem;
+                font-weight: 700;
+                color: #111827;
+                letter-spacing: -0.02em;
+            }
+            .panel-card {
+                border: 1px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 1rem 1.1rem;
+                background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+                box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+                min-height: 220px;
+            }
+            .panel-title {
+                font-size: 1.02rem;
+                color: #1e293b;
+                font-weight: 650;
+                margin-bottom: 0.6rem;
+            }
+            .stat-chip {
+                background: #eef2ff;
+                border: 1px solid #dbeafe;
+                color: #1e3a8a;
+                border-radius: 999px;
+                display: inline-block;
+                padding: 0.3rem 0.65rem;
+                font-size: 0.85rem;
+                margin-right: 0.35rem;
+                margin-bottom: 0.35rem;
+            }
+            .kpi-card {
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 14px;
+                padding: 0.8rem 0.9rem;
+                height: 100%;
+            }
+            .kpi-label {
+                color: #6b7280;
+                font-size: 0.84rem;
+                margin: 0;
+            }
+            .kpi-value {
+                color: #0f172a;
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin: 0.2rem 0 0;
+            }
+            div[data-testid="stMetric"] {
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 14px;
+                padding: 0.6rem 0.75rem;
+            }
+            div[data-testid="stDataFrame"] {
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                overflow: hidden;
             }
         </style>
         """,
@@ -68,6 +129,18 @@ def render_hero(title: str, subtitle: str) -> None:
         <div class="hero-card">
             <h2 style="margin-bottom:0.35rem;">{title}</h2>
             <p style="margin:0; opacity:0.9;">{subtitle}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_kpi_card(label: str, value: str) -> None:
+    st.markdown(
+        f"""
+        <div class="kpi-card">
+            <p class="kpi-label">{label}</p>
+            <p class="kpi-value">{value}</p>
         </div>
         """,
         unsafe_allow_html=True,
