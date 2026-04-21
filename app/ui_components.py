@@ -22,6 +22,14 @@ from src.recommender.ml_model import train_model
 from src.recommender.rules import UserProfile, generate_recommendation
 
 
+def show_ai_disclaimer() -> None:
+    """Display a concise AI safety disclaimer for user-facing outputs."""
+    st.info(
+        "⚠️ I'm an AI system and may occasionally make mistakes. "
+        "Please verify important or health-related information with a qualified professional."
+    )
+
+
 def inject_professional_theme() -> None:
     """Apply a polished visual style for all pages."""
     st.markdown(
@@ -680,6 +688,7 @@ def render_evaluation_strip() -> None:
 
 
 def render_chat_panel() -> None:
+    show_ai_disclaimer()
     st.markdown("### Clinical Q&A Dialogue")
     st.markdown(
         """
@@ -753,6 +762,7 @@ def render_chat_panel() -> None:
                 unsafe_allow_html=True,
             )
         st.markdown("</div>", unsafe_allow_html=True)
+        show_ai_disclaimer()
     else:
         st.info("No conversation yet. Ask a follow-up to begin.")
 
