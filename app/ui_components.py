@@ -28,6 +28,7 @@ def inject_professional_theme() -> None:
         """
         <style>
             .block-container {padding-top: 1.2rem; padding-bottom: 2.4rem; max-width: 1200px;}
+            .st-emotion-cache-1lads1q {justify-content: unset !important;}
             .hero-card {
                 background: linear-gradient(120deg, #0f172a 0%, #1e293b 60%, #334155 100%);
                 color: #f8fafc;
