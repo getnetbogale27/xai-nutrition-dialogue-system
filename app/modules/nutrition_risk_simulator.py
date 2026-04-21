@@ -10,6 +10,34 @@ from src.risk_simulator import NutritionRiskSimulator, RiskProfile
 
 SIMULATOR = NutritionRiskSimulator()
 
+ACTIVITY_OPTIONS = ["low", "medium", "high"]
+ACTIVITY_LABELS = {
+    "low": "Low (<150 min/week moderate activity)",
+    "medium": "Medium (150-300 min/week moderate activity)",
+    "high": "High (>300 min/week moderate activity)",
+}
+
+SLEEP_OPTIONS = ["poor", "average", "good"]
+SLEEP_LABELS = {
+    "poor": "Poor (<6 hours/night or frequent interruption)",
+    "average": "Average (6-7 hours/night, occasional interruption)",
+    "good": "Good (7-9 hours/night, restful sleep)",
+}
+
+SMOKING_OPTIONS = ["non_smoker", "occasional", "regular"]
+SMOKING_LABELS = {
+    "non_smoker": "Non-smoker (0 cigarettes/day)",
+    "occasional": "Occasional (1-5 cigarettes/day or social smoking)",
+    "regular": "Regular (>5 cigarettes/day)",
+}
+
+ALCOHOL_OPTIONS = ["none", "moderate", "high"]
+ALCOHOL_LABELS = {
+    "none": "None (0 drinks/week)",
+    "moderate": "Moderate (1-7 drinks/week)",
+    "high": "High (8+ drinks/week)",
+}
+
 
 def _default_profile() -> RiskProfile:
     return RiskProfile(
@@ -85,11 +113,31 @@ def render_nutrition_risk_simulator() -> None:
         st.markdown("#### Activity & Lifestyle Indicators")
         l1, l2 = st.columns(2)
         with l1:
-            st.selectbox("Activity Level", ["low", "medium", "high"], key="risk_activity_level")
-            st.selectbox("Sleep Quality", ["poor", "average", "good"], key="risk_sleep_quality")
+            st.selectbox(
+                "Activity Level",
+                ACTIVITY_OPTIONS,
+                format_func=lambda option: ACTIVITY_LABELS[option],
+                key="risk_activity_level",
+            )
+            st.selectbox(
+                "Sleep Quality",
+                SLEEP_OPTIONS,
+                format_func=lambda option: SLEEP_LABELS[option],
+                key="risk_sleep_quality",
+            )
         with l2:
-            st.selectbox("Smoking Status", ["non_smoker", "occasional", "regular"], key="risk_smoking_status")
-            st.selectbox("Alcohol Use", ["none", "moderate", "high"], key="risk_alcohol_use")
+            st.selectbox(
+                "Smoking Status",
+                SMOKING_OPTIONS,
+                format_func=lambda option: SMOKING_LABELS[option],
+                key="risk_smoking_status",
+            )
+            st.selectbox(
+                "Alcohol Use",
+                ALCOHOL_OPTIONS,
+                format_func=lambda option: ALCOHOL_LABELS[option],
+                key="risk_alcohol_use",
+            )
 
         st.slider("Stress Level (1=low, 10=high)", 1, 10, key="risk_stress_level")
 
@@ -167,15 +215,22 @@ def render_nutrition_risk_simulator() -> None:
             )
         else:
             options = {
-                "activity_level": ["low", "medium", "high"],
-                "sleep_quality": ["poor", "average", "good"],
-                "smoking_status": ["non_smoker", "occasional", "regular"],
-                "alcohol_use": ["none", "moderate", "high"],
+                "activity_level": ACTIVITY_OPTIONS,
+                "sleep_quality": SLEEP_OPTIONS,
+                "smoking_status": SMOKING_OPTIONS,
+                "alcohol_use": ALCOHOL_OPTIONS,
+            }
+            option_labels = {
+                "activity_level": ACTIVITY_LABELS,
+                "sleep_quality": SLEEP_LABELS,
+                "smoking_status": SMOKING_LABELS,
+                "alcohol_use": ALCOHOL_LABELS,
             }
             new_value = st.selectbox(
                 f"New {variables[variable]}",
                 options[variable],
                 index=options[variable].index(getattr(original_profile, variable)),
+                format_func=lambda option: option_labels[variable][option],
                 key="risk_scenario_category_value",
             )
 
