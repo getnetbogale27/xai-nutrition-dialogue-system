@@ -26,6 +26,7 @@ from app.ui_components import (  # noqa: E402
     run_recommendation_pipeline,
 )
 from src.explainability import explanation_engine  # noqa: E402
+from app.modules.nutrition_risk_simulator import render_nutrition_risk_simulator  # noqa: E402
 from src.recommender.rules import UserProfile, generate_recommendation  # noqa: E402
 
 st.set_page_config(page_title="XAI Nutrition Dialogue System", page_icon="🧠", layout="wide")
@@ -37,6 +38,7 @@ PAGES = [
     "Explainability Console",
     "Explainable Reasoning Engine",
     "Interactive Dialogue",
+    "Nutrition Risk Simulator (XAI)",
     "User Guide",
     "Author Details",
 ]
@@ -45,6 +47,7 @@ PAGE_ICONS = {
     "Explainability Console": "🔍",
     "Explainable Reasoning Engine": "🧠",
     "Interactive Dialogue": "💬",
+    "Nutrition Risk Simulator (XAI)": "🧪",
     "User Guide": "📘",
     "Author Details": "👤",
 }
@@ -291,6 +294,11 @@ def show_dialogue() -> None:
     render_chat_panel()
 
 
+
+def show_nutrition_risk_simulator() -> None:
+    render_nutrition_risk_simulator()
+
+
 def show_user_guide() -> None:
     render_hero(
         "WUR DECIDE Portfolio Guide",
@@ -335,6 +343,8 @@ elif st.session_state.page == "Explainable Reasoning Engine":
     show_reasoning_engine()
 elif st.session_state.page == "Interactive Dialogue":
     show_dialogue()
+elif st.session_state.page == "Nutrition Risk Simulator (XAI)":
+    show_nutrition_risk_simulator()
 elif st.session_state.page == "User Guide":
     show_user_guide()
 elif st.session_state.page == "Author Details":
