@@ -1,4 +1,4 @@
-"""Explanation and transparency page."""
+"""Dialogue page for follow-up recommendation questions."""
 
 from pathlib import Path
 import sys
@@ -12,17 +12,19 @@ if str(PROJECT_ROOT) not in sys.path:
 from app.ui_components import (
     initialize_state,
     inject_professional_theme,
-    render_explanation_panel,
+    render_chat_panel,
     render_hero,
+    render_workflow_sidebar,
 )
 
-st.set_page_config(page_title="Explanations", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Dialogue", page_icon="💬", layout="wide")
 inject_professional_theme()
 initialize_state()
+render_workflow_sidebar(current_step=3)
 
 render_hero(
-    "Explainability Console",
-    "Inspect natural-language rationale, reasoning trace, and feature-level influence.",
+    "Interactive Dialogue",
+    "Conduct context-aware follow-up discussion to improve trust and understanding.",
 )
 
-render_explanation_panel()
+render_chat_panel()

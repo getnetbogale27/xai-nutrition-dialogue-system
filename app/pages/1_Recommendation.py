@@ -16,12 +16,14 @@ from app.ui_components import (
     render_hero,
     render_profile_controls,
     render_recommendation_summary,
+    render_workflow_sidebar,
     run_recommendation_pipeline,
 )
 
 st.set_page_config(page_title="Recommendation", page_icon="📋", layout="wide")
 inject_professional_theme()
 initialize_state()
+render_workflow_sidebar(current_step=1)
 
 render_hero(
     "Recommendation Studio",
