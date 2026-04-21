@@ -55,3 +55,62 @@ def generate_explanation(profile: UserProfile, recommendation: dict) -> dict[str
         "natural_language": natural,
         "trace": _rule_trace(profile, predicted_label),
     }
+
+
+def generate_counterfactual_explanation(original_input: Any, new_input: Any) -> dict[str, Any]:
+    """Generate a human-readable comparison between baseline and modified scenarios."""
+
+    def _read(obj: Any, field: str, default: Any = None) -> Any:
+        if isinstance(obj, dict):
+            return obj.get(field, default)
+        return getattr(obj, field, default)
+
+    tracked_fields = ("age", "weight", "activity_level", "sugar_preference")
+    label_map = {
+        "age": "Age",
+        "weight": "Weight",
+        "activity_level": "Activity level",
+        "sugar_preference": "Sugar preference",
+    }
+
+    key_differences: list[str] = []
+    expected_effect: list[str] = []
+    for field in tracked_fields:
+        before = _read(original_input, field)
+        after = _read(new_input, field)
+        if before != after:
+            key_differences.append(f"{label_map[field]}: {before} → {after}")
+            if field == "activity_level":
+                expected_effect.append(
+                    "Changing activity level typically has a strong directional impact in SHAP analysis."
+                )
+            elif field == "weight":
+                expected_effect.append(
+                    "Weight shifts can substantially change calorie-oriented recommendations."
+                )
+            elif field == "sugar_preference":
+                expected_effect.append(
+                    "Sugar preference alters low-carb vs balanced tendencies in the model."
+                )
+            else:
+                expected_effect.append("Age contributes a moderate adjustment to model confidence.")
+
+    if not key_differences:
+        return {
+            "key_differences": ["No input features were changed."],
+            "expected_effect": ["Prediction is expected to remain stable."],
+            "human_readable": "No counterfactual changes were applied, so the recommendation should stay the same.",
+        }
+
+    narrative = (
+        "Counterfactual scenario updated the profile by: "
+        + "; ".join(key_differences)
+        + ". Expected model effect: "
+        + " ".join(expected_effect)
+    )
+
+    return {
+        "key_differences": key_differences,
+        "expected_effect": expected_effect,
+        "human_readable": narrative,
+    }
