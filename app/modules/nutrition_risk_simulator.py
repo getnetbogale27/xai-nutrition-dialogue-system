@@ -9,6 +9,7 @@ import pandas as pd
 import pycountry
 import streamlit as st
 
+from app.ui_components import show_ai_disclaimer
 from src.risk_simulator import NutritionRiskSimulator, RiskProfile
 
 
@@ -161,6 +162,7 @@ def render_nutrition_risk_simulator() -> None:
     st.caption(
         "Modular, explainable risk scoring with baseline weighted model and one-variable scenario simulation."
     )
+    show_ai_disclaimer()
 
     input_tab, results_tab, explain_tab, simulation_tab = st.tabs(
         ["Input", "Results", "Explanation", "Simulation"]
