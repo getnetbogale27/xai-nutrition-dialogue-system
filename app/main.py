@@ -1,6 +1,15 @@
 """Minimal Streamlit app for nutrition recommendation + explanations + chat."""
 
+from pathlib import Path
+import sys
+
 import streamlit as st
+
+# Ensure project root is on PYTHONPATH so `src` imports work when running
+# `streamlit run app/main.py`.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.dialogue.chatbot import NutritionChatbot
 from src.explainability.explanation_engine import generate_explanation
