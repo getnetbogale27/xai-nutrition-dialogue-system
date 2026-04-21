@@ -74,28 +74,31 @@ def render_hero(title: str, subtitle: str) -> None:
     )
 
 
-def render_author_details_sidebar() -> None:
-    """Render author details in a dedicated sidebar section."""
+def render_author_details() -> None:
+    """Render author details in the main content area."""
     author_query = "Getnet B. Begashaw"
-    with st.sidebar:
-        with st.expander("Author Details", expanded=False):
-            st.markdown("**Getnet B. Begashaw (PhD in Statistics)**")
-            st.markdown("📧 getnetbogale145@gmail.com")
+    with st.container(border=True):
+        st.markdown("### 👤 Getnet B. Begashaw")
+        st.markdown("**PhD in Statistics**")
+        st.markdown("📧 getnetbogale145@gmail.com")
 
-            st.markdown("#### Professional Links")
+        st.markdown("#### Professional Links")
+        c1, c2 = st.columns(2)
+        with c1:
             st.link_button(
                 "LinkedIn",
                 f"https://www.linkedin.com/search/results/all/?keywords={author_query.replace(' ', '%20')}",
                 use_container_width=True,
             )
             st.link_button(
-                "Google Scholar",
-                f"https://scholar.google.com/scholar?q={author_query.replace(' ', '+')}",
-                use_container_width=True,
-            )
-            st.link_button(
                 "GitHub",
                 f"https://github.com/search?q={author_query.replace(' ', '+')}",
+                use_container_width=True,
+            )
+        with c2:
+            st.link_button(
+                "Google Scholar",
+                f"https://scholar.google.com/scholar?q={author_query.replace(' ', '+')}",
                 use_container_width=True,
             )
             st.link_button(
