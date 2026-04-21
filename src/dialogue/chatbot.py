@@ -15,10 +15,10 @@ class NutritionChatbot:
         if "why" in q or "recommendation" in q:
             return generate_explanation(profile, recommendation)
 
-        if "sugar" in q:
+        if "less sugar" in q or "sugar" in q:
             return (
-                "Yes. You can reduce sugar by limiting sweet drinks, desserts, and processed snacks, "
-                "while choosing fruit, yogurt, and whole foods."
+                "Yes. You can eat less sugar by reducing sweet drinks, desserts, and packaged snacks. "
+                "Use fruit, plain yogurt, and whole foods as replacements."
             )
 
         if "protein" in q:

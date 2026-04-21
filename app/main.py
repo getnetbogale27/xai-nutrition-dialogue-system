@@ -22,6 +22,8 @@ if "recommendation" not in st.session_state:
     st.session_state.recommendation = ""
 if "explanation" not in st.session_state:
     st.session_state.explanation = ""
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 if st.button("Generate Recommendation"):
     profile = UserProfile(
@@ -36,6 +38,7 @@ if st.button("Generate Recommendation"):
     st.session_state.profile = profile
     st.session_state.recommendation = recommendation
     st.session_state.explanation = explanation
+    st.session_state.chat_history = []
 
 if st.session_state.recommendation:
     st.subheader("2) Recommendation")
@@ -51,6 +54,10 @@ if st.button("Send Question"):
     if st.session_state.profile and st.session_state.recommendation:
         bot = NutritionChatbot()
         response = bot.respond(question, st.session_state.profile, st.session_state.recommendation)
-        st.write("**Assistant:**", response)
+        st.session_state.chat_history.append((question, response))
     else:
         st.warning("Please generate a recommendation first.")
+
+for q, a in st.session_state.chat_history:
+    st.markdown(f"**You:** {q}")
+    st.markdown(f"**Assistant:** {a}")

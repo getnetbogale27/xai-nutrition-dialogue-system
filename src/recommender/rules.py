@@ -17,11 +17,11 @@ def generate_recommendation(profile: UserProfile) -> str:
     preference = profile.dietary_preference.strip().lower()
 
     if activity in {"high", "very active"}:
-        base = "Higher-energy meal plan with lean protein, whole grains, and healthy fats"
+        activity_plan = "Higher-energy meal plan with lean protein, whole grains, and healthy fats"
     elif activity in {"moderate", "medium"}:
-        base = "Balanced meal plan with moderate carbohydrates, vegetables, and lean protein"
+        activity_plan = "Balanced meal plan with moderate carbohydrates, vegetables, and lean protein"
     else:
-        base = "Lower-calorie meal plan focused on vegetables, protein, and fiber-rich foods"
+        activity_plan = "Lower-calorie meal plan focused on vegetables, protein, and fiber-rich foods"
 
     if profile.weight >= 90:
         weight_note = "with portion control and reduced sugary snacks"
@@ -30,16 +30,13 @@ def generate_recommendation(profile: UserProfile) -> str:
     else:
         weight_note = "with regular meal timing"
 
-    if profile.age >= 50:
-        age_note = "and calcium-rich foods for bone health"
-    else:
-        age_note = "and plenty of hydration"
+    age_note = "and calcium-rich foods for bone health" if profile.age >= 50 else "and plenty of hydration"
 
     if preference in {"vegetarian", "vegan"}:
-        pref_note = f"Adapted to a {preference} pattern using legumes, tofu, nuts, and seeds"
+        preference_note = f"Adapted to a {preference} pattern using legumes, tofu, nuts, and seeds"
     elif preference in {"low carb", "low-carb"}:
-        pref_note = "Adjusted for lower carbohydrate intake with extra non-starchy vegetables"
+        preference_note = "Adjusted for lower carbohydrate intake with extra non-starchy vegetables"
     else:
-        pref_note = "Standard balanced dietary pattern"
+        preference_note = "Standard balanced dietary pattern"
 
-    return f"{base}, {weight_note} {age_note}. {pref_note}."
+    return f"{activity_plan}, {weight_note} {age_note}. {preference_note}."
