@@ -279,7 +279,7 @@ def inject_professional_theme() -> None:
             section[data-testid="stSidebar"] .stButton > button {
                 width: 100%;
                 text-align: left;
-                justify-content: flex-start;
+                justify-content: flex-start !important;
                 align-items: center;
             }
             section[data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
