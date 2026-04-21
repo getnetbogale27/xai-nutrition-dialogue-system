@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from inspect import signature
 
 import pandas as pd
 import streamlit as st
@@ -63,8 +64,21 @@ COUNTRY_OPTIONS = [
 ]
 
 
+def _make_risk_profile(**kwargs) -> RiskProfile:
+    """Build a profile while tolerating older RiskProfile signatures.
+
+    Some environments may import a legacy `RiskProfile` class that does not yet
+    define demographic fields such as `gender`, `date_of_birth`, `bmi_value`,
+    or `country`. Filter kwargs to accepted parameters so UI stays compatible.
+    """
+
+    accepted = set(signature(RiskProfile).parameters)
+    filtered = {key: value for key, value in kwargs.items() if key in accepted}
+    return RiskProfile(**filtered)
+
+
 def _default_profile() -> RiskProfile:
-    return RiskProfile(
+    return _make_risk_profile(
         sugar_intake_g=40.0,
         fiber_intake_g=18.0,
         fruit_veg_servings=3.0,
@@ -82,7 +96,7 @@ def _default_profile() -> RiskProfile:
 
 
 def _build_profile_from_state() -> RiskProfile:
-    return RiskProfile(
+    return _make_risk_profile(
         sugar_intake_g=float(st.session_state.risk_sugar_intake_g),
         fiber_intake_g=float(st.session_state.risk_fiber_intake_g),
         fruit_veg_servings=float(st.session_state.risk_fruit_veg_servings),
