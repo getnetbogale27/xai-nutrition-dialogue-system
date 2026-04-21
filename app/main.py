@@ -14,10 +14,7 @@ from app.ui_components import (
     initialize_state,
     inject_professional_theme,
 )
-from src.explainability.explanation_engine import (
-    generate_counterfactual_explanation,
-    generate_explanation,
-)
+from src.explainability import explanation_engine
 from src.recommender.rules import UserProfile, generate_recommendation
 
 st.set_page_config(page_title="Main", page_icon="🏠", layout="wide")
@@ -99,7 +96,7 @@ with tab_what_if:
         _sync_inputs("tab1")
         original_profile = baseline_profile
         original_prediction = st.session_state.last_prediction or generate_recommendation(original_profile, mode="ml-based")
-        original_explanation = st.session_state.last_explanation or generate_explanation(original_profile, original_prediction)
+        original_explanation = st.session_state.last_explanation or explanation_engine.generate_explanation(original_profile, original_prediction)
 
         scenario_profile = UserProfile(
             age=st.session_state.input_age,
@@ -109,8 +106,16 @@ with tab_what_if:
             sugar_preference=st.session_state.input_sugar,
         )
         scenario_prediction = generate_recommendation(scenario_profile, mode="ml-based")
-        scenario_explanation = generate_explanation(scenario_profile, scenario_prediction)
-        counterfactual = generate_counterfactual_explanation(original_profile, scenario_profile)
+        scenario_explanation = explanation_engine.generate_explanation(scenario_profile, scenario_prediction)
+        counterfactual_fn = getattr(explanation_engine, "generate_counterfactual_explanation", None)
+        if callable(counterfactual_fn):
+            counterfactual = counterfactual_fn(original_profile, scenario_profile)
+        else:
+            counterfactual = {
+                "key_differences": ["Counterfactual comparison unavailable in this runtime."],
+                "expected_effect": ["Upgrade src.explainability.explanation_engine to include generate_counterfactual_explanation()."],
+                "human_readable": "Counterfactual explanation helper is unavailable; showing recommendation comparison only.",
+            }
 
         st.session_state.reasoning_result = {
             "mode": "what_if",
@@ -159,7 +164,7 @@ with tab_bayesian:
             sugar_preference=st.session_state.input_sugar,
         )
         scenario_prediction = generate_recommendation(scenario_profile, mode="ml-based")
-        scenario_explanation = generate_explanation(scenario_profile, scenario_prediction)
+        scenario_explanation = explanation_engine.generate_explanation(scenario_profile, scenario_prediction)
         st.session_state.reasoning_result = {
             "mode": "bayesian",
             "profile": scenario_profile,
