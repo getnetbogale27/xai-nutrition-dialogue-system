@@ -14,13 +14,11 @@ from app.ui_components import (
     inject_professional_theme,
     render_explanation_panel,
     render_hero,
-    render_workflow_sidebar,
 )
 
 st.set_page_config(page_title="Explanations", page_icon="🔍", layout="wide")
 inject_professional_theme()
 initialize_state()
-render_workflow_sidebar(current_step=3)
 
 render_hero(
     "Explainability Console",

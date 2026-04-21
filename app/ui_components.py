@@ -74,29 +74,6 @@ def render_hero(title: str, subtitle: str) -> None:
     )
 
 
-def render_workflow_sidebar(current_step: int = 0) -> None:
-    """Render a top-down workflow guide in the sidebar."""
-    steps = [
-        ("Home", "Start here for overview"),
-        ("User Guide", "Understand the workflow, controls, and interpretation tips"),
-        ("1. Recommendation", "Build or refresh the personalized plan"),
-        ("2. Explanations", "Review why the model made this decision"),
-        ("3. Dialogue", "Ask follow-up and what-if questions"),
-    ]
-
-    with st.sidebar:
-        st.markdown("### Workflow")
-        st.caption("Move from top to bottom for a guided experience.")
-        for idx, (title, detail) in enumerate(steps):
-            if idx == current_step:
-                st.markdown(f"**➡️ {title}**")
-                st.caption(f"{detail} *(current)*")
-            else:
-                st.markdown(f"- {title}")
-                st.caption(detail)
-        st.divider()
-
-
 def render_author_details_sidebar() -> None:
     """Render author details in a dedicated sidebar section."""
     author_query = "Getnet B. Begashaw"
