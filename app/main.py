@@ -58,9 +58,10 @@ link_cols[3].link_button(
 st.markdown(
     """
     Use the workflow sidebar top-to-bottom:
-    1. **Recommendation** → create or update a personalized plan.
-    2. **Explanations** → inspect model reasoning and feature impact.
-    3. **Dialogue** → ask follow-up what-if and trust-building questions.
+    1. **User Guide** → review usage instructions and interpretation tips.
+    2. **Recommendation** → create or update a personalized plan.
+    3. **Explanations** → inspect model reasoning and feature impact.
+    4. **Dialogue** → ask follow-up what-if and trust-building questions.
     """
 )
 

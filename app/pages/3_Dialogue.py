@@ -20,7 +20,7 @@ from app.ui_components import (
 st.set_page_config(page_title="Dialogue", page_icon="💬", layout="wide")
 inject_professional_theme()
 initialize_state()
-render_workflow_sidebar(current_step=3)
+render_workflow_sidebar(current_step=4)
 
 render_hero(
     "Interactive Dialogue",
