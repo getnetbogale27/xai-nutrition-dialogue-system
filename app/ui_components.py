@@ -592,6 +592,27 @@ def render_explanation_panel() -> None:
     else:
         st.caption("No step-by-step trace is available for this recommendation.")
 
+    bayesian_probs = trace.get("bayesian_probabilities", {})
+    if bayesian_probs:
+        st.markdown("## Probabilistic Reasoning (Bayesian View)")
+        bayes_df = (
+            pd.DataFrame(
+                [
+                    {"diet": diet, "probability": probability}
+                    for diet, probability in bayesian_probs.items()
+                ]
+            )
+            .sort_values("probability", ascending=False)
+            .reset_index(drop=True)
+        )
+        bayes_df["diet"] = bayes_df["diet"].str.replace("_", " ").str.title()
+        bayes_df["probability"] = bayes_df["probability"].map(lambda value: f"{value:.1%}")
+
+        top_bayes = max(bayesian_probs.items(), key=lambda item: item[1])[0]
+        st.dataframe(bayes_df, use_container_width=True, hide_index=True)
+        st.success(f"Most likely diet (Bayesian): **{top_bayes.replace('_', ' ').title()}**")
+        st.caption(trace.get("bayesian_explanation", "No Bayesian explanation available."))
+
     if not shap_df.empty:
         st.markdown("### Feature contributions")
         chart_cols = st.columns([2, 1])

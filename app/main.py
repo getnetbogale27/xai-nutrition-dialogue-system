@@ -3,6 +3,7 @@
 from pathlib import Path
 import sys
 
+import pandas as pd
 import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -131,3 +132,24 @@ if "what_if_result" in st.session_state:
         "Updated SHAP rationale: "
         + data["new_explanation"].get("natural_language", "No SHAP-based explanation available.")
     )
+
+    st.markdown("## Probabilistic Reasoning (Bayesian View)")
+    bayesian_probs = data["new_explanation"].get("trace", {}).get("bayesian_probabilities", {})
+    if bayesian_probs:
+        bayesian_df = (
+            pd.DataFrame(
+                [{"Diet": diet.replace("_", " ").title(), "Probability": prob} for diet, prob in bayesian_probs.items()]
+            )
+            .sort_values("Probability", ascending=False)
+            .reset_index(drop=True)
+        )
+        st.dataframe(
+            bayesian_df.assign(Probability=bayesian_df["Probability"].map(lambda value: f"{value:.1%}")),
+            use_container_width=True,
+            hide_index=True,
+        )
+        most_likely = max(bayesian_probs.items(), key=lambda item: item[1])[0]
+        st.success(f"Most likely Bayesian diet: **{most_likely.replace('_', ' ').title()}**")
+        st.write(data["new_explanation"].get("trace", {}).get("bayesian_explanation", ""))
+    else:
+        st.info("Bayesian probabilities are not available for this scenario.")
