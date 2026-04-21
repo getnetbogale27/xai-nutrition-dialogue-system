@@ -273,9 +273,21 @@ def inject_professional_theme() -> None:
                 border-radius: 12px;
                 overflow: hidden;
             }
-            section[data-testid="stSidebar"] .stButton > button {
+            section[data-testid="stSidebar"] .stButton {
                 text-align: left;
-                justify-content: flex-start;
+            }
+            section[data-testid="stSidebar"] .stButton > button {
+                width: 100%;
+                text-align: left;
+                justify-content: flex-start !important;
+                align-items: center;
+            }
+            section[data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] {
+                width: 100%;
+            }
+            section[data-testid="stSidebar"] .stButton > button div[data-testid="stMarkdownContainer"] p {
+                margin: 0;
+                text-align: left;
             }
         </style>
         """,
