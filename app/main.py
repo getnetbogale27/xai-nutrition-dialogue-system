@@ -93,7 +93,6 @@ with tab_what_if:
     st.selectbox("Sugar Preference", ["low", "high"], key="tab1_sugar", on_change=_sync_inputs, args=("tab1",))
 
     if st.button("Run What-If Simulation", type="primary", use_container_width=True):
-        _sync_inputs("tab1")
         original_profile = baseline_profile
         original_prediction = st.session_state.last_prediction or generate_recommendation(original_profile, mode="ml-based")
         original_explanation = st.session_state.last_explanation or explanation_engine.generate_explanation(original_profile, original_prediction)
@@ -155,7 +154,6 @@ with tab_bayesian:
     st.selectbox("Sugar Preference", ["low", "high"], key="tab2_sugar", on_change=_sync_inputs, args=("tab2",))
 
     if st.button("Compute Probabilities", use_container_width=True):
-        _sync_inputs("tab2")
         scenario_profile = UserProfile(
             age=st.session_state.input_age,
             weight=float(st.session_state.input_weight),
