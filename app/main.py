@@ -157,7 +157,8 @@ def show_what_if() -> None:
     with st.container(border=True):
         st.markdown("#### What-If Calculator")
         c1, c2 = st.columns(2)
-        st.number_input("Age", min_value=10, max_value=80, key="reasoning_age", step=1)
+        with c1:
+            st.number_input("Age", min_value=10, max_value=80, key="reasoning_age", step=1)
         with c2:
             st.number_input("Weight (kg)", min_value=30, max_value=150, key="reasoning_weight", step=1)
         c3, c4 = st.columns(2)
@@ -242,7 +243,7 @@ def show_probabilistic() -> None:
                 index=["low", "high"].index(st.session_state.reasoning_sugar),
             )
 
-        if st.button("Compute Probabilities", use_container_width=True):
+        if st.button("Compute Probabilities", type="primary", use_container_width=True):
             scenario_profile = UserProfile(
                 age=st.session_state.reasoning_age_prob,
                 weight=float(st.session_state.reasoning_weight_prob),
