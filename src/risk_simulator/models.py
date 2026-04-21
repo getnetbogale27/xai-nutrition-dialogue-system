@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from typing import Literal
 
 ActivityLevel = Literal["low", "medium", "high"]
@@ -24,6 +25,10 @@ class RiskProfile:
     smoking_status: SmokingStatus
     alcohol_use: AlcoholUse
     stress_level: int
+    gender: str = "prefer_not_to_say"
+    date_of_birth: date | None = None
+    bmi_value: float | None = None
+    country: str = ""
 
 
 @dataclass(frozen=True)
