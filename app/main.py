@@ -13,6 +13,13 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.dialogue.chatbot import NutritionChatbot
+from src.evaluation.metrics import (
+    explanation_consistency_score,
+    feature_importance_stability,
+    model_confidence_distribution,
+    rule_vs_ml_comparison,
+)
+from src.evaluation.user_study_simulation import simulate_user_feedback
 from src.explainability.explanation_engine import generate_explanation
 from src.recommender.ml_model import train_model
 from src.recommender.rules import UserProfile, generate_recommendation
@@ -31,6 +38,8 @@ if "last_explanation" not in st.session_state:
     st.session_state.last_explanation = {}
 if "last_shap_output" not in st.session_state:
     st.session_state.last_shap_output = []
+if "evaluation_feedback" not in st.session_state:
+    st.session_state.evaluation_feedback = {}
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "chatbot" not in st.session_state:
@@ -73,6 +82,7 @@ if generate_clicked:
     st.session_state.last_prediction = recommendation
     st.session_state.last_explanation = explanation
     st.session_state.last_shap_output = explanation.get("trace", {}).get("contributions", [])
+    st.session_state.evaluation_feedback = simulate_user_feedback(explanation, recommendation)
     st.session_state.chat_history = []
 
 with center:
@@ -122,7 +132,52 @@ with right:
     else:
         st.info("Explainability details will appear after generating a recommendation.")
 
+
 st.divider()
+st.subheader("Evaluation Panel")
+
+if st.session_state.last_prediction and st.session_state.last_explanation:
+    eval_feedback = st.session_state.evaluation_feedback
+    rec = st.session_state.last_prediction
+    exp = st.session_state.last_explanation
+
+    consistency = explanation_consistency_score(exp)
+    stability = feature_importance_stability(st.session_state.last_shap_output)
+    confidence = model_confidence_distribution(rec.get("probabilities", {}))
+
+    ml_rec = dict(rec)
+    ml_exp = dict(exp)
+    ml_rec["mode"] = "ml-based"
+    ml_feedback = simulate_user_feedback(ml_exp, ml_rec)
+
+    rule_rec = dict(rec)
+    rule_exp = dict(exp)
+    rule_rec["mode"] = "rule-based"
+    rule_feedback = simulate_user_feedback(rule_exp, rule_rec)
+
+    comparison = rule_vs_ml_comparison(ml_feedback, rule_feedback)
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Trust Score", f"{eval_feedback.get('trust_score', 0.0):.2f}")
+    c2.metric("Explanation Quality", f"{eval_feedback.get('explanation_quality', 0.0):.2f}")
+    c3.metric("Satisfaction", f"{eval_feedback.get('satisfaction', 0.0):.2f}")
+
+    st.markdown("#### ML vs Rule-based Comparison")
+    st.write(
+        f"ML average: **{comparison['ml_average']:.2f}** | "
+        f"Rule average: **{comparison['rule_average']:.2f}** | "
+        f"ML advantage index: **{comparison['ml_advantage']:.2f}**"
+    )
+
+    st.markdown("#### Additional Evaluation Metrics")
+    st.write(
+        f"Explanation consistency: **{consistency:.2f}** | "
+        f"Feature-importance stability: **{stability:.2f}** | "
+        f"Max confidence: **{confidence['max_confidence']:.2f}**"
+    )
+else:
+    st.info("Evaluation metrics appear after generating a recommendation.")
+
 st.subheader("Follow-up Dialogue")
 question = st.text_input(
     "Ask follow-up questions",
