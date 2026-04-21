@@ -23,7 +23,34 @@ initialize_state()
 
 render_hero(
     "XAI Nutrition Dialogue System",
-    "Professor-grade decision support for transparent, personalized nutrition guidance.",
+    "Portfolio project for PostDoc/PhD opportunities in Causal AI and explainable decision support.",
+)
+
+st.markdown("### Author")
+st.markdown("**Getnet B. Begashaw (PhD in Statistics)**  \n📧 getnetbogale145@gmail.com")
+
+st.markdown("### Professional Links")
+author_query = "Getnet B. Begashaw"
+link_cols = st.columns(4)
+link_cols[0].link_button(
+    "LinkedIn",
+    f"https://www.linkedin.com/search/results/all/?keywords={author_query.replace(' ', '%20')}",
+    use_container_width=True,
+)
+link_cols[1].link_button(
+    "Google Scholar",
+    f"https://scholar.google.com/scholar?q={author_query.replace(' ', '+')}",
+    use_container_width=True,
+)
+link_cols[2].link_button(
+    "GitHub",
+    f"https://github.com/search?q={author_query.replace(' ', '+')}",
+    use_container_width=True,
+)
+link_cols[3].link_button(
+    "Causal AI Work",
+    f"https://www.google.com/search?q={author_query.replace(' ', '+')}+causal+AI",
+    use_container_width=True,
 )
 
 st.markdown(
