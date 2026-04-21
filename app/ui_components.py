@@ -274,8 +274,8 @@ def inject_professional_theme() -> None:
                 overflow: hidden;
             }
             section[data-testid="stSidebar"] .stButton > button {
-                text-align: center;
-                justify-content: center;
+                text-align: left;
+                justify-content: flex-start;
             }
         </style>
         """,
