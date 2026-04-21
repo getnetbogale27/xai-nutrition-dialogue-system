@@ -6,6 +6,7 @@ from datetime import date
 from inspect import signature
 
 import pandas as pd
+import pycountry
 import streamlit as st
 
 from src.risk_simulator import NutritionRiskSimulator, RiskProfile
@@ -49,19 +50,7 @@ GENDER_LABELS = {
     "prefer_not_to_say": "Prefer not to say",
 }
 
-COUNTRY_OPTIONS = [
-    "",
-    "United States",
-    "Canada",
-    "United Kingdom",
-    "Australia",
-    "India",
-    "Germany",
-    "France",
-    "Brazil",
-    "Japan",
-    "Other",
-]
+COUNTRY_OPTIONS = [""] + sorted(country.name for country in pycountry.countries) + ["Other"]
 
 
 def _make_risk_profile(**kwargs) -> RiskProfile:
