@@ -50,10 +50,107 @@ def inject_professional_theme() -> None:
             .panel-card {
                 border: 1px solid #e2e8f0;
                 border-radius: 18px;
-                padding: 1rem 1.1rem;
+                padding: 1.05rem 1.15rem;
                 background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
                 box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
                 min-height: 220px;
+            }
+            .explain-layout {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1rem;
+                margin-bottom: 0.8rem;
+            }
+            .explain-title {
+                margin: 0 0 0.35rem;
+                font-size: 1.05rem;
+                font-weight: 650;
+                color: #0f172a;
+            }
+            .explain-subtitle {
+                margin: 0 0 0.75rem;
+                color: #475569;
+                font-size: 0.92rem;
+            }
+            .rationale-copy {
+                margin: 0;
+                color: #1f2937;
+                line-height: 1.55;
+                font-size: 1rem;
+            }
+            .impact-list {
+                margin: 0.2rem 0 0;
+                padding: 0;
+                list-style: none;
+            }
+            .impact-list li {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 0.45rem;
+                padding: 0.45rem 0.55rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                background: #ffffff;
+                font-size: 0.9rem;
+                color: #1e293b;
+            }
+            .impact-pill {
+                border-radius: 999px;
+                padding: 0.12rem 0.5rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+            .impact-positive {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #bbf7d0;
+            }
+            .impact-negative {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fecaca;
+            }
+            .explain-kpi-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 0.7rem;
+                margin: 0.25rem 0 1rem;
+            }
+            .trace-card {
+                margin-top: 0.25rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 0.85rem 0.9rem;
+                background: #ffffff;
+            }
+            .trace-step {
+                display: grid;
+                grid-template-columns: 30px 1fr;
+                gap: 0.6rem;
+                align-items: start;
+                padding: 0.4rem 0;
+                border-bottom: 1px dashed #e2e8f0;
+            }
+            .trace-step:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            .trace-index {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: #e0e7ff;
+                color: #3730a3;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                font-weight: 700;
+            }
+            .trace-text {
+                margin: 0.15rem 0 0;
+                color: #1f2937;
             }
             .panel-title {
                 font-size: 1.02rem;
@@ -260,26 +357,116 @@ def render_explanation_panel() -> None:
         st.info("Generate a recommendation first to inspect explanation details.")
         return
 
-    st.markdown("### Natural-language rationale")
-    st.write(exp.get("natural_language", "No explanation available."))
-
     trace = exp.get("trace", {})
+    shap_rows = st.session_state.last_shap_output
+    top_feature = "n/a"
+    top_contribution = 0.0
+    negative_count = 0
+    contribution_count = 0
+
+    if shap_rows:
+        shap_df = pd.DataFrame(shap_rows)
+        if {"feature", "contribution"}.issubset(shap_df.columns):
+            contribution_count = len(shap_df)
+            ranked = shap_df.reindex(shap_df["contribution"].abs().sort_values(ascending=False).index)
+            if not ranked.empty:
+                top_feature = str(ranked.iloc[0]["feature"])
+                top_contribution = float(ranked.iloc[0]["contribution"])
+            negative_count = int((shap_df["contribution"] < 0).sum())
+        else:
+            shap_df = pd.DataFrame()
+    else:
+        shap_df = pd.DataFrame()
+
+    st.markdown("### Explainability Studio")
+    st.markdown(
+        """
+        <div class="explain-kpi-grid">
+            <div class="kpi-card">
+                <p class="kpi-label">Top Driver</p>
+                <p class="kpi-value">{top_feature}</p>
+            </div>
+            <div class="kpi-card">
+                <p class="kpi-label">Strongest Influence</p>
+                <p class="kpi-value">{top_contribution:+.3f}</p>
+            </div>
+            <div class="kpi-card">
+                <p class="kpi-label">Features Reviewed</p>
+                <p class="kpi-value">{contribution_count}</p>
+            </div>
+        </div>
+        """.format(
+            top_feature=top_feature.replace("_", " ").title(),
+            top_contribution=top_contribution,
+            contribution_count=contribution_count,
+        ),
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+        <div class="explain-layout">
+            <div class="panel-card">
+                <h4 class="explain-title">Natural-language rationale</h4>
+                <p class="explain-subtitle">Human-friendly summary of why this recommendation was produced.</p>
+                <p class="rationale-copy">{exp.get("natural_language", "No explanation available.")}</p>
+            </div>
+            <div class="panel-card">
+                <h4 class="explain-title">Signal balance</h4>
+                <p class="explain-subtitle">Direction of factors that increased or reduced confidence.</p>
+                <ul class="impact-list">
+                    <li><span>Positive influences</span><span class="impact-pill impact-positive">{max(contribution_count - negative_count, 0)}</span></li>
+                    <li><span>Negative influences</span><span class="impact-pill impact-negative">{negative_count}</span></li>
+                </ul>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.markdown("### Reasoning trace")
     if trace.get("human_readable"):
-        for idx, step in enumerate(trace["human_readable"], start=1):
-            st.write(f"{idx}. {step}")
+        steps = trace["human_readable"]
     else:
-        for idx, item in enumerate(trace.get("contributions", []), start=1):
-            detail = item.get("reason") or f"{item.get('feature')} contribution={item.get('contribution', 0):+.2f}"
-            st.write(f"{idx}. {detail}")
+        steps = []
+        for item in trace.get("contributions", []):
+            steps.append(item.get("reason") or f"{item.get('feature')} contribution={item.get('contribution', 0):+.2f}")
 
-    shap_rows = st.session_state.last_shap_output
-    if shap_rows:
+    if steps:
+        trace_markup = ['<div class="trace-card">']
+        for idx, step in enumerate(steps, start=1):
+            trace_markup.append(
+                f"""
+                <div class="trace-step">
+                    <span class="trace-index">{idx}</span>
+                    <p class="trace-text">{step}</p>
+                </div>
+                """
+            )
+        trace_markup.append("</div>")
+        st.markdown("".join(trace_markup), unsafe_allow_html=True)
+    else:
+        st.caption("No step-by-step trace is available for this recommendation.")
+
+    if not shap_df.empty:
         st.markdown("### Feature contributions")
-        shap_df = pd.DataFrame(shap_rows)
-        if "contribution" in shap_df.columns:
+        chart_cols = st.columns([2, 1])
+        with chart_cols[0]:
             st.bar_chart(shap_df.set_index("feature")["contribution"])
-        st.dataframe(shap_df, use_container_width=True)
+        with chart_cols[1]:
+            st.markdown("#### Ranking by absolute impact")
+            ranked_df = shap_df.assign(abs_contribution=shap_df["contribution"].abs()).sort_values(
+                "abs_contribution",
+                ascending=False,
+            )
+            st.dataframe(
+                ranked_df[["feature", "contribution"]].reset_index(drop=True),
+                use_container_width=True,
+                hide_index=True,
+            )
+
+        with st.expander("View raw contribution table"):
+            st.dataframe(shap_df, use_container_width=True, hide_index=True)
 
 
 def render_evaluation_strip() -> None:
