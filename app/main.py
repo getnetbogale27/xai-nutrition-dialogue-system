@@ -33,24 +33,24 @@ inject_professional_theme()
 initialize_state()
 
 PAGES = [
-    "Recommendation",
-    "Explanations",
+    "Recommendation Studio",
+    "Explainability Console",
     "Explainable Reasoning Engine",
-    "Dialogue",
+    "Interactive Dialogue",
     "User Guide",
     "Author Details",
 ]
 PAGE_ICONS = {
-    "Recommendation": "📋",
-    "Explanations": "🔍",
+    "Recommendation Studio": "📋",
+    "Explainability Console": "🔍",
     "Explainable Reasoning Engine": "🧠",
-    "Dialogue": "💬",
+    "Interactive Dialogue": "💬",
     "User Guide": "📘",
     "Author Details": "👤",
 }
 
 if "page" not in st.session_state or st.session_state.page not in PAGES:
-    st.session_state.page = "Recommendation"
+    st.session_state.page = "Recommendation Studio"
 
 
 def _set_page(page_name: str) -> None:
@@ -327,13 +327,13 @@ for page in PAGES:
         args=(page,),
     )
 
-if st.session_state.page == "Recommendation":
+if st.session_state.page == "Recommendation Studio":
     show_recommendation()
-elif st.session_state.page == "Explanations":
+elif st.session_state.page == "Explainability Console":
     show_explanations()
 elif st.session_state.page == "Explainable Reasoning Engine":
     show_reasoning_engine()
-elif st.session_state.page == "Dialogue":
+elif st.session_state.page == "Interactive Dialogue":
     show_dialogue()
 elif st.session_state.page == "User Guide":
     show_user_guide()
