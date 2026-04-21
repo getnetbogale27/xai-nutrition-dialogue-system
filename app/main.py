@@ -15,14 +15,12 @@ from app.ui_components import (
     profile_to_table,
     render_evaluation_strip,
     render_hero,
-    render_workflow_sidebar,
     render_author_details_sidebar,
 )
 
 st.set_page_config(page_title="XAI Nutrition Dialogue", page_icon="🥗", layout="wide")
 inject_professional_theme()
 initialize_state()
-render_workflow_sidebar(current_step=0)
 render_author_details_sidebar()
 
 render_hero(
@@ -32,11 +30,11 @@ render_hero(
 
 st.markdown(
     """
-    Use the workflow sidebar top-to-bottom:
-    1. **User Guide** → review usage instructions and interpretation tips.
-    2. **Recommendation** → create or update a personalized plan.
-    3. **Explanations** → inspect model reasoning and feature impact.
-    4. **Dialogue** → ask follow-up what-if and trust-building questions.
+    Navigate pages from the sidebar:
+    - **📋 Recommendation** to create or update a personalized plan.
+    - **🔍 Explanations** to inspect model reasoning and feature impact.
+    - **💬 Dialogue** to ask follow-up what-if and trust-building questions.
+    - **📘 User Guide** (now at the bottom) for complete usage instructions.
     """
 )
 

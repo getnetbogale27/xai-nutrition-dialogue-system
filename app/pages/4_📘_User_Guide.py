@@ -13,13 +13,11 @@ from app.ui_components import (
     initialize_state,
     inject_professional_theme,
     render_hero,
-    render_workflow_sidebar,
 )
 
 st.set_page_config(page_title="User Guide", page_icon="📘", layout="wide")
 inject_professional_theme()
 initialize_state()
-render_workflow_sidebar(current_step=1)
 
 render_hero(
     "User Guide",
