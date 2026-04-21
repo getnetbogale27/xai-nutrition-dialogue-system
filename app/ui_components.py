@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from html import escape
+import re
 
 import pandas as pd
 import streamlit as st
@@ -566,13 +567,25 @@ def render_explanation_panel() -> None:
             steps.append(item.get("reason") or f"{item.get('feature')} contribution={item.get('contribution', 0):+.2f}")
 
     if steps:
+        def _clean_trace_step(step: object) -> str:
+            text = str(step or "").strip()
+            if not text:
+                return ""
+            # If malformed HTML leaks into trace content, keep only readable text.
+            text = re.sub(r"<[^>]+>", " ", text)
+            text = re.sub(r"\s+", " ", text).strip()
+            return text
+
+        clean_steps = [_clean_trace_step(step) for step in steps]
+        clean_steps = [step for step in clean_steps if step]
+
         trace_markup = ['<div class="trace-card">']
-        for idx, step in enumerate(steps, start=1):
+        for idx, clean_step in enumerate(clean_steps, start=1):
             trace_markup.append(
                 f"""
                 <div class="trace-step">
                     <span class="trace-index">{idx}</span>
-                    <p class="trace-text">{step}</p>
+                    <p class="trace-text">{escape(clean_step)}</p>
                 </div>
                 """
             )
