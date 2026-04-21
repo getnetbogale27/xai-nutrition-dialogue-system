@@ -45,8 +45,8 @@ In addition to simulated user outcomes, the evaluation layer computes:
 
 These metrics provide lightweight but reproducible indicators for comparative system analysis.
 
-## 5. Expected Contributions and DECIDE Alignment
-This prototype contributes a reproducible framework for explainable nutrition recommendation that aligns with DECIDE-oriented goals in transparent and responsible AI decision support:
+## 5. Expected Contributions and Research Alignment
+This prototype contributes a reproducible framework for explainable nutrition recommendation that aligns with transparent and responsible AI goals in decision support:
 
 - A practical hybrid architecture combining symbolic and statistical reasoning.
 - Integrated explainability that is both machine-auditable and user-facing.

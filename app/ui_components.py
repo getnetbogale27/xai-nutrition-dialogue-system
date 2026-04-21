@@ -370,17 +370,17 @@ def render_author_details() -> None:
             )
 
 
-def render_wur_job_fit_portfolio() -> None:
-    """Render a portfolio section tailored to the WUR DECIDE PhD vacancy."""
-    st.markdown("### 🎯 Portfolio Fit: WUR DECIDE PhD (xAI for Nutrition)")
+def render_research_job_fit_portfolio() -> None:
+    """Render a portfolio section tailored to transparent AI research applications."""
+    st.markdown("### 🎯 Portfolio Fit: Transparent AI for Nutrition")
     st.caption(
-        "This project is structured to reflect the responsibilities and quality profile from the "
-        "Wageningen/Utrecht DECIDE PhD call (application deadline: 30 April 2026)."
+        "This project is structured to demonstrate readiness for PhD/PostDoc roles in causal AI, "
+        "explainable AI, and human-centered decision support systems."
     )
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        render_kpi_card("Target Role", "PhD Candidate")
+        render_kpi_card("Target Role", "PhD/PostDoc")
     with c2:
         render_kpi_card("Core Domain", "xAI + Nutrition")
     with c3:
@@ -418,7 +418,7 @@ def render_wur_job_fit_portfolio() -> None:
         )
 
     with b:
-        st.markdown("#### DECIDE-Oriented Next Steps")
+        st.markdown("#### Research-Oriented Next Steps")
         st.markdown(
             """
             1. Add **counterfactual recourse prompts** ("what minimal change improves recommendation quality?").

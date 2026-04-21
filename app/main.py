@@ -22,7 +22,7 @@ from app.ui_components import (  # noqa: E402
     render_kpi_card,
     render_profile_controls,
     render_recommendation_summary,
-    render_wur_job_fit_portfolio,
+    render_research_job_fit_portfolio,
     run_recommendation_pipeline,
 )
 from src.explainability import explanation_engine  # noqa: E402
@@ -301,10 +301,10 @@ def show_nutrition_risk_simulator() -> None:
 
 def show_user_guide() -> None:
     render_hero(
-        "WUR DECIDE Portfolio Guide",
-        "How this app demonstrates fit for the PhD position: xAI to support better dietary decisions.",
+        "Research Portfolio Guide",
+        "How this app demonstrates fit for PhD/PostDoc applications in causal and explainable AI for nutrition.",
     )
-    render_wur_job_fit_portfolio()
+    render_research_job_fit_portfolio()
 
     st.markdown("### What this system provides")
     st.markdown(
