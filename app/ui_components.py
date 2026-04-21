@@ -97,6 +97,37 @@ def render_workflow_sidebar(current_step: int = 0) -> None:
         st.divider()
 
 
+def render_author_details_sidebar() -> None:
+    """Render author details in a dedicated sidebar section."""
+    author_query = "Getnet B. Begashaw"
+    with st.sidebar:
+        with st.expander("Author Details", expanded=False):
+            st.markdown("**Getnet B. Begashaw (PhD in Statistics)**")
+            st.markdown("📧 getnetbogale145@gmail.com")
+
+            st.markdown("#### Professional Links")
+            st.link_button(
+                "LinkedIn",
+                f"https://www.linkedin.com/search/results/all/?keywords={author_query.replace(' ', '%20')}",
+                use_container_width=True,
+            )
+            st.link_button(
+                "Google Scholar",
+                f"https://scholar.google.com/scholar?q={author_query.replace(' ', '+')}",
+                use_container_width=True,
+            )
+            st.link_button(
+                "GitHub",
+                f"https://github.com/search?q={author_query.replace(' ', '+')}",
+                use_container_width=True,
+            )
+            st.link_button(
+                "Causal AI Work",
+                f"https://www.google.com/search?q={author_query.replace(' ', '+')}+causal+AI",
+                use_container_width=True,
+            )
+
+
 def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str, bool]:
     """Render profile controls and return profile, mode and generate click state."""
     with st.container(border=True):
