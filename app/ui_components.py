@@ -78,6 +78,7 @@ def render_workflow_sidebar(current_step: int = 0) -> None:
     """Render a top-down workflow guide in the sidebar."""
     steps = [
         ("Home", "Start here for overview"),
+        ("User Guide", "Understand the workflow, controls, and interpretation tips"),
         ("1. Recommendation", "Build or refresh the personalized plan"),
         ("2. Explanations", "Review why the model made this decision"),
         ("3. Dialogue", "Ask follow-up and what-if questions"),
