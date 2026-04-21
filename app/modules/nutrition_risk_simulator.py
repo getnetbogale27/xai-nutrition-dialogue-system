@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import pandas as pd
 import streamlit as st
 
@@ -38,6 +40,28 @@ ALCOHOL_LABELS = {
     "high": "High (8+ drinks/week)",
 }
 
+GENDER_OPTIONS = ["female", "male", "non_binary", "prefer_not_to_say"]
+GENDER_LABELS = {
+    "female": "Female",
+    "male": "Male",
+    "non_binary": "Non-binary",
+    "prefer_not_to_say": "Prefer not to say",
+}
+
+COUNTRY_OPTIONS = [
+    "",
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Australia",
+    "India",
+    "Germany",
+    "France",
+    "Brazil",
+    "Japan",
+    "Other",
+]
+
 
 def _default_profile() -> RiskProfile:
     return RiskProfile(
@@ -50,6 +74,10 @@ def _default_profile() -> RiskProfile:
         smoking_status="non_smoker",
         alcohol_use="moderate",
         stress_level=5,
+        gender="prefer_not_to_say",
+        date_of_birth=None,
+        bmi_value=None,
+        country="",
     )
 
 
@@ -64,7 +92,30 @@ def _build_profile_from_state() -> RiskProfile:
         smoking_status=st.session_state.risk_smoking_status,
         alcohol_use=st.session_state.risk_alcohol_use,
         stress_level=int(st.session_state.risk_stress_level),
+        gender=st.session_state.risk_gender,
+        date_of_birth=st.session_state.risk_date_of_birth,
+        bmi_value=st.session_state.risk_bmi_value,
+        country=st.session_state.risk_country,
     )
+
+
+def _compute_bmi(weight_kg: float, height_cm: float) -> float | None:
+    if height_cm <= 0:
+        return None
+    height_m = height_cm / 100.0
+    return weight_kg / (height_m * height_m)
+
+
+def _bmi_category(bmi: float | None) -> str:
+    if bmi is None:
+        return "Not set"
+    if bmi < 18.5:
+        return "Underweight"
+    if bmi < 25:
+        return "Normal"
+    if bmi < 30:
+        return "Overweight"
+    return "Obese"
 
 
 def _ensure_defaults() -> None:
@@ -73,6 +124,16 @@ def _ensure_defaults() -> None:
         session_key = f"risk_{key}"
         if session_key not in st.session_state:
             st.session_state[session_key] = value
+    if "risk_date_of_birth" not in st.session_state:
+        st.session_state.risk_date_of_birth = date(1990, 1, 1)
+    if "risk_bmi_metric_weight_kg" not in st.session_state:
+        st.session_state.risk_bmi_metric_weight_kg = 70.0
+    if "risk_bmi_metric_height_cm" not in st.session_state:
+        st.session_state.risk_bmi_metric_height_cm = 170.0
+    if "risk_bmi_imperial_weight_lb" not in st.session_state:
+        st.session_state.risk_bmi_imperial_weight_lb = 154.0
+    if "risk_bmi_imperial_height_in" not in st.session_state:
+        st.session_state.risk_bmi_imperial_height_in = 67.0
 
 
 def _result_to_frame(result) -> pd.DataFrame:
@@ -101,6 +162,51 @@ def render_nutrition_risk_simulator() -> None:
     )
 
     with input_tab:
+        st.markdown("#### Personal & Demographic Inputs")
+        p1, p2 = st.columns(2)
+        with p1:
+            st.selectbox(
+                "Gender",
+                GENDER_OPTIONS,
+                format_func=lambda option: GENDER_LABELS[option],
+                key="risk_gender",
+            )
+            st.date_input(
+                "Date of Birth",
+                min_value=date(1920, 1, 1),
+                max_value=date.today(),
+                key="risk_date_of_birth",
+            )
+        with p2:
+            st.selectbox("Country", COUNTRY_OPTIONS, key="risk_country")
+
+            bmi_unit = st.radio("BMI Calculator Units", ["Metric (kg/cm)", "Imperial (lb/in)"], horizontal=True)
+            if bmi_unit == "Metric (kg/cm)":
+                weight_kg = st.number_input(
+                    "Weight (kg)", min_value=10.0, max_value=350.0, step=0.5, key="risk_bmi_metric_weight_kg"
+                )
+                height_cm = st.number_input(
+                    "Height (cm)", min_value=50.0, max_value=250.0, step=0.5, key="risk_bmi_metric_height_cm"
+                )
+                bmi_value = _compute_bmi(weight_kg, height_cm)
+            else:
+                weight_lb = st.number_input(
+                    "Weight (lb)", min_value=22.0, max_value=770.0, step=1.0, key="risk_bmi_imperial_weight_lb"
+                )
+                height_in = st.number_input(
+                    "Height (in)", min_value=20.0, max_value=100.0, step=0.5, key="risk_bmi_imperial_height_in"
+                )
+                bmi_value = _compute_bmi(weight_lb * 0.45359237, height_in * 2.54)
+
+            if st.button("Calculate BMI", use_container_width=True):
+                st.session_state.risk_bmi_value = bmi_value
+
+            current_bmi = st.session_state.risk_bmi_value
+            if current_bmi is not None:
+                st.info(f"Current BMI: {current_bmi:.1f} ({_bmi_category(current_bmi)})")
+            else:
+                st.caption("Click **Calculate BMI** to store BMI in the profile.")
+
         st.markdown("#### Diet Indicators")
         d1, d2 = st.columns(2)
         with d1:
