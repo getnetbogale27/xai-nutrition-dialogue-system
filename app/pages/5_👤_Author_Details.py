@@ -28,7 +28,7 @@ render_hero(
 render_author_details()
 
 with st.container(border=True):
-    st.markdown("### 🧭 Positioning for the WUR DECIDE PhD")
+    st.markdown("### 🧭 Positioning for Transparent AI Research Roles")
     st.markdown(
         """
         - This portfolio demonstrates **hybrid AI system design** (ML + symbolic/rule-based reasoning).

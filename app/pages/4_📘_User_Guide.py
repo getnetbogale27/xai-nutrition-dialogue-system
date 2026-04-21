@@ -13,7 +13,7 @@ from app.ui_components import (
     initialize_state,
     inject_professional_theme,
     render_hero,
-    render_wur_job_fit_portfolio,
+    render_research_job_fit_portfolio,
 )
 
 st.set_page_config(page_title="User Guide", page_icon="📘", layout="wide")
@@ -21,11 +21,11 @@ inject_professional_theme()
 initialize_state()
 
 render_hero(
-    "WUR DECIDE Portfolio Guide",
-    "How this app demonstrates fit for the PhD position: xAI to support better dietary decisions.",
+    "Research Portfolio Guide",
+    "How this app demonstrates fit for PhD/PostDoc applications in causal and explainable AI for nutrition.",
 )
 
-render_wur_job_fit_portfolio()
+render_research_job_fit_portfolio()
 
 st.markdown("### What this system provides")
 st.markdown(
@@ -78,6 +78,6 @@ st.info(
     - Compare ML and rule-based outputs when decisions are sensitive.
     - Use dialogue to test scenario changes (e.g., reduced sugar, higher activity).
     - Treat this tool as decision support; final nutrition plans should be reviewed by professionals.
-    - For the WUR application, frame this prototype as a baseline for controlled human-AI studies.
+    - For applications, frame this prototype as a baseline for controlled human-AI studies.
     """
 )
