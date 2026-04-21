@@ -148,6 +148,8 @@ def _ensure_defaults() -> None:
         st.session_state.risk_bmi_imperial_weight_lb = 154.0
     if "risk_bmi_imperial_height_in" not in st.session_state:
         st.session_state.risk_bmi_imperial_height_in = 67.0
+    if "risk_bmi_value" not in st.session_state:
+        st.session_state.risk_bmi_value = None
 
 
 def _result_to_frame(result) -> pd.DataFrame:
