@@ -40,6 +40,14 @@ PAGES = [
     "User Guide",
     "Author Details",
 ]
+PAGE_ICONS = {
+    "Recommendation": "📋",
+    "Explanations": "🔍",
+    "Explainable Reasoning Engine": "🧠",
+    "Dialogue": "💬",
+    "User Guide": "📘",
+    "Author Details": "👤",
+}
 
 if "page" not in st.session_state or st.session_state.page not in PAGES:
     st.session_state.page = "Recommendation"
@@ -308,10 +316,9 @@ def show_author_details() -> None:
     render_author_details()
 
 
-st.sidebar.markdown("### Navigation")
 for page in PAGES:
     st.sidebar.button(
-        page,
+        f"{PAGE_ICONS.get(page, '•')}  {page}",
         key=f"nav_{page}",
         use_container_width=True,
         type="primary" if st.session_state.page == page else "secondary",

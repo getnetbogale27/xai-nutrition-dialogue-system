@@ -273,6 +273,10 @@ def inject_professional_theme() -> None:
                 border-radius: 12px;
                 overflow: hidden;
             }
+            section[data-testid="stSidebar"] .stButton > button {
+                text-align: center;
+                justify-content: center;
+            }
         </style>
         """,
         unsafe_allow_html=True,
