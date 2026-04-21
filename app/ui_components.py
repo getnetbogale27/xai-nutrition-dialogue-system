@@ -352,6 +352,65 @@ def render_author_details() -> None:
             )
 
 
+def render_wur_job_fit_portfolio() -> None:
+    """Render a portfolio section tailored to the WUR DECIDE PhD vacancy."""
+    st.markdown("### 🎯 Portfolio Fit: WUR DECIDE PhD (xAI for Nutrition)")
+    st.caption(
+        "This project is structured to reflect the responsibilities and quality profile from the "
+        "Wageningen/Utrecht DECIDE PhD call (application deadline: 30 April 2026)."
+    )
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        render_kpi_card("Target Role", "PhD Candidate")
+    with c2:
+        render_kpi_card("Core Domain", "xAI + Nutrition")
+    with c3:
+        render_kpi_card("AI Methods", "ML + Rule-based")
+    with c4:
+        render_kpi_card("Interaction", "Dialogue-first")
+
+    st.markdown("#### Requirement-to-Implementation Mapping")
+    with st.container(border=True):
+        st.markdown(
+            """
+            - **Transparent recommendation system for nutrition intake** → Hybrid pipeline combining logistic-regression
+              predictions with deterministic rule-based reasoning.
+            - **Explainability strategies** → Natural-language rationale, contribution ranking, and trace-based explanation
+              views for each generated recommendation.
+            - **User-facing explanation interfaces** → Dedicated explanation console and conversational follow-up module.
+            - **Trust calibration and behaviour outcomes** → Simulated user-study metrics (trust, explanation quality,
+              consistency, stability) visible in the evaluation strip.
+            - **Technical + human-centred evaluation** → Confidence, consistency, and comparative feedback between
+              ML and rule-based modes.
+            """
+        )
+
+    a, b = st.columns(2)
+    with a:
+        st.markdown("#### Research Contribution Highlights")
+        st.markdown(
+            """
+            1. **Hybrid xAI architecture** connecting statistical prediction with symbolic logic.
+            2. **Dialogue-based explanation workflow** for contestability and user understanding.
+            3. **Human-centred evaluation hooks** to support reproducible behavioural experiments.
+            4. **Portfolio-ready modularity** through separated `recommender`, `explainability`, `dialogue`,
+               and `evaluation` components.
+            """
+        )
+
+    with b:
+        st.markdown("#### DECIDE-Oriented Next Steps")
+        st.markdown(
+            """
+            1. Add **counterfactual recourse prompts** ("what minimal change improves recommendation quality?").
+            2. Integrate a **nutrition knowledge graph** for domain-grounded explanations.
+            3. Extend fairness checks for **robustness and subgroup reliability**.
+            4. Run controlled studies with **trust calibration** and decision-quality outcomes.
+            """
+        )
+
+
 def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str, bool]:
     """Render profile controls and return profile, mode and generate click state."""
     with st.container(border=True):

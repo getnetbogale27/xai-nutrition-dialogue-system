@@ -22,7 +22,18 @@ initialize_state()
 
 render_hero(
     "Author Details",
-    "Professional profile and relevant links for the project author.",
+    "Professional profile, research focus, and application-ready positioning.",
 )
 
 render_author_details()
+
+with st.container(border=True):
+    st.markdown("### 🧭 Positioning for the WUR DECIDE PhD")
+    st.markdown(
+        """
+        - This portfolio demonstrates **hybrid AI system design** (ML + symbolic/rule-based reasoning).
+        - The app includes **transparent explanation interfaces** and **dialogue-based explanation support**.
+        - The evaluation layer is structured for **trust calibration** and **human-centred assessment**.
+        - The architecture is modular and extensible for **knowledge graph integration** and **real-world studies**.
+        """
+    )
