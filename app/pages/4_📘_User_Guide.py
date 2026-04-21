@@ -81,3 +81,39 @@ st.info(
     - For applications, frame this prototype as a baseline for controlled human-AI studies.
     """
 )
+
+st.markdown("### Healthy Living Insights & Recommendations")
+with st.container(border=True):
+    st.markdown(
+        """
+        1. **Maintain a Healthy Weight**  
+        Aim for steady, realistic habits instead of quick fixes. Small changes in eating, movement, and sleep can improve energy and support long-term health.
+
+        2. **Be Physically Active Most Days**  
+        Include regular movement such as walking, cycling, dancing, or strength exercises. Even short activity sessions during the day can make a meaningful difference.
+
+        3. **Avoid Smoking and Tobacco**  
+        Choosing not to smoke protects your heart, lungs, and overall health. If you currently smoke, seeking support to quit is a positive and powerful step.
+
+        4. **Choose a Balanced, Whole-Food Diet**  
+        Base your meals on vegetables, fruits, whole grains, legumes, lean proteins, and healthy fats. Limit heavily processed foods and sugary snacks when possible.
+
+        5. **Use Alcohol in Moderation (or Avoid It)**  
+        If you drink alcohol, keep amounts low and include alcohol-free days each week. Drinking mindfully supports liver health, sleep quality, and weight goals.
+
+        6. **Prioritize Sleep Quality**  
+        Keep a regular sleep schedule and aim for enough rest each night. Good sleep helps with appetite control, mood, concentration, and recovery.
+
+        7. **Stay Hydrated**  
+        Drink water consistently throughout the day, especially during physical activity or warm weather. Simple habits like carrying a water bottle can help.
+
+        8. **Manage Stress in Healthy Ways**  
+        Practice stress-reducing habits such as breathing exercises, stretching, short walks, or quiet time. Managing stress supports healthier food choices and better overall well-being.
+
+        9. **Keep Up with Preventive Check-Ups**  
+        Regular health visits and screenings can identify issues early and support better outcomes. Talk with your healthcare provider about the right check-up schedule for you.
+
+        10. **Support Social Connection and Mental Well-Being**  
+        Spend time with people who support and encourage you. Strong social connections can improve resilience, reduce stress, and promote a healthier lifestyle.
+        """
+    )
