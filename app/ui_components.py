@@ -578,19 +578,17 @@ def render_explanation_panel() -> None:
 
         clean_steps = [_clean_trace_step(step) for step in steps]
         clean_steps = [step for step in clean_steps if step]
-
-        trace_markup = ['<div class="trace-card">']
-        for idx, clean_step in enumerate(clean_steps, start=1):
-            trace_markup.append(
-                f"""
-                <div class="trace-step">
-                    <span class="trace-index">{idx}</span>
-                    <p class="trace-text">{escape(clean_step)}</p>
-                </div>
-                """
-            )
-        trace_markup.append("</div>")
-        st.markdown("".join(trace_markup), unsafe_allow_html=True)
+        if clean_steps:
+            trace_markup = ['<div class="trace-card">']
+            for idx, clean_step in enumerate(clean_steps, start=1):
+                trace_markup.append(
+                    f'<div class="trace-step"><span class="trace-index">{idx}</span>'
+                    f'<p class="trace-text">{escape(clean_step)}</p></div>'
+                )
+            trace_markup.append("</div>")
+            st.markdown("".join(trace_markup), unsafe_allow_html=True)
+        else:
+            st.caption("No step-by-step trace is available for this recommendation.")
     else:
         st.caption("No step-by-step trace is available for this recommendation.")
 
