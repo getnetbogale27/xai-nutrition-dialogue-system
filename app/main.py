@@ -13,6 +13,7 @@ from app.ui_components import (
     initialize_state,
     inject_professional_theme,
     render_hero,
+    render_wur_job_fit_portfolio,
 )
 
 st.set_page_config(page_title="Main", page_icon="🏠", layout="wide")
@@ -21,10 +22,9 @@ initialize_state()
 
 render_hero(
     "XAI Nutrition Dialogue System",
-    "Portfolio project for PostDoc/PhD opportunities in Causal AI and explainable decision support.",
+    "Portfolio project tailored for the Wageningen DECIDE PhD on transparent, explainable AI for dietary behaviour change.",
 )
 
-st.info(
-    "Snapshot and evaluation panels now live in the **Recommendation** page. "
-    "Use the sidebar to open **📋 Recommendation**."
-)
+render_wur_job_fit_portfolio()
+
+st.info("Use the sidebar flow: **📋 Recommendation → 🔍 Explanations → 💬 Dialogue → 📘 User Guide**.")
