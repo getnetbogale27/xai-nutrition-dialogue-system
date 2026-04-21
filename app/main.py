@@ -13,8 +13,6 @@ if str(PROJECT_ROOT) not in sys.path:
 from app.ui_components import (
     initialize_state,
     inject_professional_theme,
-    render_hero,
-    render_wur_job_fit_portfolio,
 )
 from src.explainability.explanation_engine import (
     generate_counterfactual_explanation,
@@ -26,17 +24,6 @@ st.set_page_config(page_title="Main", page_icon="🏠", layout="wide")
 inject_professional_theme()
 initialize_state()
 
-render_hero(
-    "XAI Nutrition Dialogue System",
-    "Portfolio project tailored for the Wageningen DECIDE PhD on transparent, explainable AI for dietary behaviour change.",
-)
-
-render_wur_job_fit_portfolio()
-
-st.info("Use the sidebar flow: **📋 Recommendation → 🔍 Explanations → 💬 Dialogue → 📘 User Guide**.")
-
-st.sidebar.title("What-If Nutrition Simulator")
-
 baseline_profile = st.session_state.profile or UserProfile(
     age=30,
     weight=70.0,
@@ -45,111 +32,177 @@ baseline_profile = st.session_state.profile or UserProfile(
     sugar_preference="low",
 )
 
-what_if_age = st.sidebar.slider("Age", min_value=10, max_value=80, value=int(baseline_profile.age))
-what_if_weight = st.sidebar.slider(
-    "Weight (kg)", min_value=30, max_value=150, value=int(round(baseline_profile.weight))
-)
-what_if_activity = st.sidebar.selectbox(
-    "Activity Level", ["low", "medium", "high"], index=["low", "medium", "high"].index(baseline_profile.activity_level)
-)
-what_if_sugar = st.sidebar.selectbox(
-    "Sugar Preference", ["low", "high"], index=["low", "high"].index(baseline_profile.sugar_preference)
-)
+if "input_age" not in st.session_state:
+    st.session_state.input_age = int(baseline_profile.age)
+if "input_weight" not in st.session_state:
+    st.session_state.input_weight = int(round(baseline_profile.weight))
+if "input_activity" not in st.session_state:
+    st.session_state.input_activity = baseline_profile.activity_level
+if "input_sugar" not in st.session_state:
+    st.session_state.input_sugar = baseline_profile.sugar_preference
 
-simulate_clicked = st.sidebar.button("Simulate New Scenario", type="primary", use_container_width=True)
+if "tab1_age" not in st.session_state:
+    st.session_state.tab1_age = st.session_state.input_age
+if "tab1_weight" not in st.session_state:
+    st.session_state.tab1_weight = st.session_state.input_weight
+if "tab1_activity" not in st.session_state:
+    st.session_state.tab1_activity = st.session_state.input_activity
+if "tab1_sugar" not in st.session_state:
+    st.session_state.tab1_sugar = st.session_state.input_sugar
+if "tab2_age" not in st.session_state:
+    st.session_state.tab2_age = st.session_state.input_age
+if "tab2_weight" not in st.session_state:
+    st.session_state.tab2_weight = st.session_state.input_weight
+if "tab2_activity" not in st.session_state:
+    st.session_state.tab2_activity = st.session_state.input_activity
+if "tab2_sugar" not in st.session_state:
+    st.session_state.tab2_sugar = st.session_state.input_sugar
 
-if simulate_clicked:
-    original_profile = baseline_profile
-    original_prediction = st.session_state.last_prediction or generate_recommendation(original_profile, mode="ml-based")
-    original_explanation = st.session_state.last_explanation or generate_explanation(
-        original_profile, original_prediction
+
+def _sync_inputs(source_tab: str) -> None:
+    if source_tab == "tab1":
+        st.session_state.input_age = st.session_state.tab1_age
+        st.session_state.input_weight = st.session_state.tab1_weight
+        st.session_state.input_activity = st.session_state.tab1_activity
+        st.session_state.input_sugar = st.session_state.tab1_sugar
+    else:
+        st.session_state.input_age = st.session_state.tab2_age
+        st.session_state.input_weight = st.session_state.tab2_weight
+        st.session_state.input_activity = st.session_state.tab2_activity
+        st.session_state.input_sugar = st.session_state.tab2_sugar
+
+    st.session_state.tab1_age = st.session_state.input_age
+    st.session_state.tab1_weight = st.session_state.input_weight
+    st.session_state.tab1_activity = st.session_state.input_activity
+    st.session_state.tab1_sugar = st.session_state.input_sugar
+    st.session_state.tab2_age = st.session_state.input_age
+    st.session_state.tab2_weight = st.session_state.input_weight
+    st.session_state.tab2_activity = st.session_state.input_activity
+    st.session_state.tab2_sugar = st.session_state.input_sugar
+
+st.sidebar.title("Explainable Reasoning Engine")
+tab_what_if, tab_bayesian = st.sidebar.tabs(["What-If Calculator", "Probabilistic Reasoning (Bayesian)"])
+
+with tab_what_if:
+    st.slider("Age", min_value=10, max_value=80, key="tab1_age", on_change=_sync_inputs, args=("tab1",))
+    st.slider("Weight (kg)", min_value=30, max_value=150, key="tab1_weight", on_change=_sync_inputs, args=("tab1",))
+    st.selectbox(
+        "Activity Level",
+        ["low", "medium", "high"],
+        key="tab1_activity",
+        on_change=_sync_inputs,
+        args=("tab1",),
     )
+    st.selectbox("Sugar Preference", ["low", "high"], key="tab1_sugar", on_change=_sync_inputs, args=("tab1",))
 
-    counterfactual_profile = UserProfile(
-        age=what_if_age,
-        weight=float(what_if_weight),
-        activity_level=what_if_activity,
-        dietary_preference="balanced",
-        sugar_preference=what_if_sugar,
-    )
-    new_prediction = generate_recommendation(counterfactual_profile, mode="ml-based")
-    new_explanation = generate_explanation(counterfactual_profile, new_prediction)
+    if st.button("Run What-If Simulation", type="primary", use_container_width=True):
+        _sync_inputs("tab1")
+        original_profile = baseline_profile
+        original_prediction = st.session_state.last_prediction or generate_recommendation(original_profile, mode="ml-based")
+        original_explanation = st.session_state.last_explanation or generate_explanation(original_profile, original_prediction)
 
-    st.session_state.what_if_result = {
-        "original_profile": original_profile,
-        "original_prediction": original_prediction,
-        "original_explanation": original_explanation,
-        "new_profile": counterfactual_profile,
-        "new_prediction": new_prediction,
-        "new_explanation": new_explanation,
-        "counterfactual_explanation": generate_counterfactual_explanation(original_profile, counterfactual_profile),
-    }
-
-if "what_if_result" in st.session_state:
-    data = st.session_state.what_if_result
-    st.divider()
-    st.subheader("Current Prediction")
-    st.success(data["new_prediction"].get("diet_label", "n/a").replace("_", " ").title())
-
-    st.subheader("Counterfactual Comparison")
-    before_col, after_col = st.columns(2)
-    with before_col:
-        st.markdown("#### Before (Original Input)")
-        st.json(
-            {
-                "age": data["original_profile"].age,
-                "weight": data["original_profile"].weight,
-                "activity_level": data["original_profile"].activity_level,
-                "sugar_preference": data["original_profile"].sugar_preference,
-                "prediction": data["original_prediction"].get("diet_label"),
-            }
+        scenario_profile = UserProfile(
+            age=st.session_state.input_age,
+            weight=float(st.session_state.input_weight),
+            activity_level=st.session_state.input_activity,
+            dietary_preference="balanced",
+            sugar_preference=st.session_state.input_sugar,
         )
-    with after_col:
-        st.markdown("#### After (Modified Scenario)")
-        st.json(
-            {
-                "age": data["new_profile"].age,
-                "weight": data["new_profile"].weight,
-                "activity_level": data["new_profile"].activity_level,
-                "sugar_preference": data["new_profile"].sugar_preference,
-                "prediction": data["new_prediction"].get("diet_label"),
-            }
+        scenario_prediction = generate_recommendation(scenario_profile, mode="ml-based")
+        scenario_explanation = generate_explanation(scenario_profile, scenario_prediction)
+        counterfactual = generate_counterfactual_explanation(original_profile, scenario_profile)
+
+        st.session_state.reasoning_result = {
+            "mode": "what_if",
+            "profile": scenario_profile,
+            "prediction": scenario_prediction,
+            "explanation": scenario_explanation,
+            "comparison": {
+                "original_profile": original_profile,
+                "original_prediction": original_prediction,
+                "counterfactual_explanation": counterfactual,
+            },
+        }
+
+    result = st.session_state.get("reasoning_result", {})
+    if result.get("mode") == "what_if":
+        st.success(
+            f"Updated ML prediction: **{result['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}**"
+        )
+        st.caption("SHAP + Bayesian summary")
+        st.write(result["explanation"].get("natural_language", "No explanation available."))
+        st.caption("Before vs After")
+        st.write(
+            f"**Before:** {result['comparison']['original_prediction'].get('diet_label', 'n/a')} → "
+            f"**After:** {result['prediction'].get('diet_label', 'n/a')}"
         )
 
-    st.markdown("#### What changed")
-    for change in data["counterfactual_explanation"]["key_differences"]:
-        st.write(f"- {change}")
-
-    st.markdown("#### How prediction changed")
-    st.write(
-        f"Recommendation: **{data['original_prediction'].get('diet_label', 'n/a')}** → "
-        f"**{data['new_prediction'].get('diet_label', 'n/a')}**"
+with tab_bayesian:
+    st.slider("Age", min_value=10, max_value=80, key="tab2_age", on_change=_sync_inputs, args=("tab2",))
+    st.slider("Weight (kg)", min_value=30, max_value=150, key="tab2_weight", on_change=_sync_inputs, args=("tab2",))
+    st.selectbox(
+        "Activity Level",
+        ["low", "medium", "high"],
+        key="tab2_activity",
+        on_change=_sync_inputs,
+        args=("tab2",),
     )
+    st.selectbox("Sugar Preference", ["low", "high"], key="tab2_sugar", on_change=_sync_inputs, args=("tab2",))
 
-    st.markdown("#### Why it changed")
-    st.write(data["counterfactual_explanation"]["human_readable"])
-    st.caption(
-        "Updated SHAP rationale: "
-        + data["new_explanation"].get("natural_language", "No SHAP-based explanation available.")
-    )
+    if st.button("Compute Probabilities", use_container_width=True):
+        _sync_inputs("tab2")
+        scenario_profile = UserProfile(
+            age=st.session_state.input_age,
+            weight=float(st.session_state.input_weight),
+            activity_level=st.session_state.input_activity,
+            dietary_preference="balanced",
+            sugar_preference=st.session_state.input_sugar,
+        )
+        scenario_prediction = generate_recommendation(scenario_profile, mode="ml-based")
+        scenario_explanation = generate_explanation(scenario_profile, scenario_prediction)
+        st.session_state.reasoning_result = {
+            "mode": "bayesian",
+            "profile": scenario_profile,
+            "prediction": scenario_prediction,
+            "explanation": scenario_explanation,
+            "comparison": st.session_state.get("reasoning_result", {}).get("comparison"),
+        }
 
-    st.markdown("## Probabilistic Reasoning (Bayesian View)")
-    bayesian_probs = data["new_explanation"].get("trace", {}).get("bayesian_probabilities", {})
+    result = st.session_state.get("reasoning_result", {})
+    bayesian_probs = result.get("explanation", {}).get("trace", {}).get("bayesian_probabilities", {})
     if bayesian_probs:
-        bayesian_df = (
-            pd.DataFrame(
-                [{"Diet": diet.replace("_", " ").title(), "Probability": prob} for diet, prob in bayesian_probs.items()]
-            )
-            .sort_values("Probability", ascending=False)
-            .reset_index(drop=True)
+        ordered = ["balanced", "high_protein", "low_carb", "low_calorie"]
+        bayesian_df = pd.DataFrame(
+            [{"Diet Class": diet, "Probability": bayesian_probs.get(diet, 0.0)} for diet in ordered]
+        )
+        top_diet = max(bayesian_probs.items(), key=lambda item: item[1])[0]
+        bayesian_df["Diet Class"] = bayesian_df["Diet Class"].map(
+            lambda diet: f"⭐ {diet}" if diet == top_diet else diet
         )
         st.dataframe(
-            bayesian_df.assign(Probability=bayesian_df["Probability"].map(lambda value: f"{value:.1%}")),
+            bayesian_df.assign(Probability=bayesian_df["Probability"].map(lambda prob: f"{prob:.1%}")),
             use_container_width=True,
             hide_index=True,
         )
-        most_likely = max(bayesian_probs.items(), key=lambda item: item[1])[0]
-        st.success(f"Most likely Bayesian diet: **{most_likely.replace('_', ' ').title()}**")
-        st.write(data["new_explanation"].get("trace", {}).get("bayesian_explanation", ""))
-    else:
-        st.info("Bayesian probabilities are not available for this scenario.")
+        st.success(f"Highest probability class: **{top_diet.replace('_', ' ').title()}**")
+        st.write(result.get("explanation", {}).get("trace", {}).get("bayesian_explanation", ""))
+
+st.title("Reasoning Results")
+current = st.session_state.get("reasoning_result")
+if not current:
+    st.info("Use the sidebar tools to run What-If simulation or Bayesian probability computation.")
+else:
+    st.subheader("Final Recommendation")
+    st.success(current["prediction"].get("diet_label", "n/a").replace("_", " ").title())
+
+    st.subheader("Explanation Summary")
+    st.write(current["explanation"].get("natural_language", "No explanation available."))
+
+    comparison = current.get("comparison")
+    if comparison:
+        st.subheader("Comparison")
+        st.write(
+            f"**Before:** {comparison['original_prediction'].get('diet_label', 'n/a').replace('_', ' ').title()} | "
+            f"**After:** {current['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}"
+        )
+        st.write(comparison["counterfactual_explanation"].get("human_readable", ""))
