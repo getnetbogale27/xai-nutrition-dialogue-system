@@ -17,7 +17,7 @@ from app.ui_components import (
 from src.explainability import explanation_engine
 from src.recommender.rules import UserProfile, generate_recommendation
 
-st.set_page_config(page_title="Main", page_icon="🏠", layout="wide")
+st.set_page_config(page_title="Explainable Reasoning Engine", page_icon="🧠", layout="wide")
 inject_professional_theme()
 initialize_state()
 
@@ -77,25 +77,29 @@ def _sync_inputs(source_tab: str) -> None:
     st.session_state.tab2_activity = st.session_state.input_activity
     st.session_state.tab2_sugar = st.session_state.input_sugar
 
-st.sidebar.title("Explainable Reasoning Engine")
-tab_what_if, tab_bayesian = st.sidebar.tabs(["What-If Calculator", "Probabilistic Reasoning (Bayesian)"])
 
-with tab_what_if:
-    st.slider("Age", min_value=10, max_value=80, key="tab1_age", on_change=_sync_inputs, args=("tab1",))
-    st.slider("Weight (kg)", min_value=30, max_value=150, key="tab1_weight", on_change=_sync_inputs, args=("tab1",))
-    st.selectbox(
+st.sidebar.subheader("Explainable Reasoning Engine")
+selected_reasoning_tool = st.sidebar.radio(
+    "",
+    ["What-If Calculator", "Probabilistic Reasoning"],
+    label_visibility="collapsed",
+)
+
+if selected_reasoning_tool == "What-If Calculator":
+    st.sidebar.slider("Age", min_value=10, max_value=80, key="tab1_age", on_change=_sync_inputs, args=("tab1",))
+    st.sidebar.slider("Weight (kg)", min_value=30, max_value=150, key="tab1_weight", on_change=_sync_inputs, args=("tab1",))
+    st.sidebar.selectbox(
         "Activity Level",
         ["low", "medium", "high"],
         key="tab1_activity",
         on_change=_sync_inputs,
         args=("tab1",),
     )
-    st.selectbox("Sugar Preference", ["low", "high"], key="tab1_sugar", on_change=_sync_inputs, args=("tab1",))
+    st.sidebar.selectbox("Sugar Preference", ["low", "high"], key="tab1_sugar", on_change=_sync_inputs, args=("tab1",))
 
-    if st.button("Run What-If Simulation", type="primary", use_container_width=True):
+    if st.sidebar.button("Run What-If Simulation", type="primary", use_container_width=True):
         original_profile = baseline_profile
         original_prediction = st.session_state.last_prediction or generate_recommendation(original_profile, mode="ml-based")
-        original_explanation = st.session_state.last_explanation or explanation_engine.generate_explanation(original_profile, original_prediction)
 
         scenario_profile = UserProfile(
             age=st.session_state.input_age,
@@ -128,32 +132,19 @@ with tab_what_if:
             },
         }
 
-    result = st.session_state.get("reasoning_result", {})
-    if result.get("mode") == "what_if":
-        st.success(
-            f"Updated ML prediction: **{result['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}**"
-        )
-        st.caption("SHAP + Bayesian summary")
-        st.write(result["explanation"].get("natural_language", "No explanation available."))
-        st.caption("Before vs After")
-        st.write(
-            f"**Before:** {result['comparison']['original_prediction'].get('diet_label', 'n/a')} → "
-            f"**After:** {result['prediction'].get('diet_label', 'n/a')}"
-        )
-
-with tab_bayesian:
-    st.slider("Age", min_value=10, max_value=80, key="tab2_age", on_change=_sync_inputs, args=("tab2",))
-    st.slider("Weight (kg)", min_value=30, max_value=150, key="tab2_weight", on_change=_sync_inputs, args=("tab2",))
-    st.selectbox(
+else:
+    st.sidebar.slider("Age", min_value=10, max_value=80, key="tab2_age", on_change=_sync_inputs, args=("tab2",))
+    st.sidebar.slider("Weight (kg)", min_value=30, max_value=150, key="tab2_weight", on_change=_sync_inputs, args=("tab2",))
+    st.sidebar.selectbox(
         "Activity Level",
         ["low", "medium", "high"],
         key="tab2_activity",
         on_change=_sync_inputs,
         args=("tab2",),
     )
-    st.selectbox("Sugar Preference", ["low", "high"], key="tab2_sugar", on_change=_sync_inputs, args=("tab2",))
+    st.sidebar.selectbox("Sugar Preference", ["low", "high"], key="tab2_sugar", on_change=_sync_inputs, args=("tab2",))
 
-    if st.button("Compute Probabilities", use_container_width=True):
+    if st.sidebar.button("Compute Probabilities", use_container_width=True):
         scenario_profile = UserProfile(
             age=st.session_state.input_age,
             weight=float(st.session_state.input_weight),
@@ -171,30 +162,40 @@ with tab_bayesian:
             "comparison": st.session_state.get("reasoning_result", {}).get("comparison"),
         }
 
-    result = st.session_state.get("reasoning_result", {})
-    bayesian_probs = result.get("explanation", {}).get("trace", {}).get("bayesian_probabilities", {})
-    if bayesian_probs:
-        ordered = ["balanced", "high_protein", "low_carb", "low_calorie"]
-        bayesian_df = pd.DataFrame(
-            [{"Diet Class": diet, "Probability": bayesian_probs.get(diet, 0.0)} for diet in ordered]
-        )
-        top_diet = max(bayesian_probs.items(), key=lambda item: item[1])[0]
-        bayesian_df["Diet Class"] = bayesian_df["Diet Class"].map(
-            lambda diet: f"⭐ {diet}" if diet == top_diet else diet
-        )
-        st.dataframe(
-            bayesian_df.assign(Probability=bayesian_df["Probability"].map(lambda prob: f"{prob:.1%}")),
-            use_container_width=True,
-            hide_index=True,
-        )
-        st.success(f"Highest probability class: **{top_diet.replace('_', ' ').title()}**")
-        st.write(result.get("explanation", {}).get("trace", {}).get("bayesian_explanation", ""))
-
 st.title("Reasoning Results")
+st.caption(f"Selected tool: **{selected_reasoning_tool}**")
 current = st.session_state.get("reasoning_result")
 if not current:
     st.info("Use the sidebar tools to run What-If simulation or Bayesian probability computation.")
 else:
+    if current.get("mode") == "what_if":
+        st.subheader("What-If Calculator")
+        st.success(
+            f"Updated ML prediction: **{current['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}**"
+        )
+        st.caption("SHAP + Bayesian summary")
+        st.write(current["explanation"].get("natural_language", "No explanation available."))
+
+    if current.get("mode") == "bayesian":
+        st.subheader("Probabilistic Reasoning")
+        bayesian_probs = current.get("explanation", {}).get("trace", {}).get("bayesian_probabilities", {})
+        if bayesian_probs:
+            ordered = ["balanced", "high_protein", "low_carb", "low_calorie"]
+            bayesian_df = pd.DataFrame(
+                [{"Diet Class": diet, "Probability": bayesian_probs.get(diet, 0.0)} for diet in ordered]
+            )
+            top_diet = max(bayesian_probs.items(), key=lambda item: item[1])[0]
+            bayesian_df["Diet Class"] = bayesian_df["Diet Class"].map(
+                lambda diet: f"⭐ {diet}" if diet == top_diet else diet
+            )
+            st.dataframe(
+                bayesian_df.assign(Probability=bayesian_df["Probability"].map(lambda prob: f"{prob:.1%}")),
+                use_container_width=True,
+                hide_index=True,
+            )
+            st.success(f"Highest probability class: **{top_diet.replace('_', ' ').title()}**")
+            st.write(current.get("explanation", {}).get("trace", {}).get("bayesian_explanation", ""))
+
     st.subheader("Final Recommendation")
     st.success(current["prediction"].get("diet_label", "n/a").replace("_", " ").title())
 
