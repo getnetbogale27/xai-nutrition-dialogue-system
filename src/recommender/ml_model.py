@@ -69,7 +69,7 @@ def train_model(dataset_path: Path = DATASET_PATH, model_path: Path = MODEL_PATH
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    model = LogisticRegression(max_iter=1000, multi_class="auto")
+    model = LogisticRegression(max_iter=1000)
     model.fit(X_train, y_train)
 
     predictions = model.predict(X_test)
