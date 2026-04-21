@@ -5,7 +5,7 @@ from src.recommender.rules import UserProfile
 
 
 class NutritionChatbot:
-    def respond(self, question: str, profile: UserProfile, recommendation: str) -> str:
+    def respond(self, question: str, profile: UserProfile, recommendation) -> str:
         """Return a short response based on user question intent."""
         q = question.strip().lower()
 
@@ -13,7 +13,8 @@ class NutritionChatbot:
             return "Please type a question about your recommendation."
 
         if "why" in q or "recommendation" in q:
-            return generate_explanation(profile, recommendation)
+            payload = generate_explanation(profile, recommendation)
+            return payload["natural_language"]
 
         if "less sugar" in q or "sugar" in q:
             return (
