@@ -79,11 +79,44 @@ def _sync_inputs(source_tab: str) -> None:
 
 
 st.sidebar.subheader("Explainable Reasoning Engine")
-selected_reasoning_tool = st.sidebar.radio(
-    "",
-    ["What-If Calculator", "Probabilistic Reasoning"],
-    label_visibility="collapsed",
-)
+if "show_reasoning_menu" not in st.session_state:
+    st.session_state.show_reasoning_menu = True
+if "active_page" not in st.session_state:
+    st.session_state.active_page = "What-If Calculator"
+
+
+def _toggle_reasoning_menu() -> None:
+    st.session_state.show_reasoning_menu = not st.session_state.show_reasoning_menu
+
+
+def _set_active_page(page_name: str) -> None:
+    st.session_state.active_page = page_name
+
+
+parent_label = "▼ Explainable Reasoning Engine" if st.session_state.show_reasoning_menu else "▶ Explainable Reasoning Engine"
+st.sidebar.button(parent_label, use_container_width=True, on_click=_toggle_reasoning_menu)
+
+if st.session_state.show_reasoning_menu:
+    _, nested_col = st.sidebar.columns([0.12, 0.88])
+    nested_col.button(
+        "🧪 What-If Calculator",
+        key="page_what_if",
+        use_container_width=True,
+        type="primary" if st.session_state.active_page == "What-If Calculator" else "secondary",
+        on_click=_set_active_page,
+        args=("What-If Calculator",),
+    )
+    _, nested_col = st.sidebar.columns([0.12, 0.88])
+    nested_col.button(
+        "📊 Probabilistic Reasoning",
+        key="page_probabilistic",
+        use_container_width=True,
+        type="primary" if st.session_state.active_page == "Probabilistic Reasoning" else "secondary",
+        on_click=_set_active_page,
+        args=("Probabilistic Reasoning",),
+    )
+
+selected_reasoning_tool = st.session_state.active_page
 
 if selected_reasoning_tool == "What-If Calculator":
     st.sidebar.slider("Age", min_value=10, max_value=80, key="tab1_age", on_change=_sync_inputs, args=("tab1",))
@@ -166,47 +199,57 @@ st.title("Reasoning Results")
 st.caption(f"Selected tool: **{selected_reasoning_tool}**")
 current = st.session_state.get("reasoning_result")
 if not current:
-    st.info("Use the sidebar tools to run What-If simulation or Bayesian probability computation.")
+    if selected_reasoning_tool == "What-If Calculator":
+        st.info("Use the sidebar to run a What-If simulation.")
+    else:
+        st.info("Use the sidebar to compute Bayesian probabilities.")
 else:
-    if current.get("mode") == "what_if":
+    if selected_reasoning_tool == "What-If Calculator":
         st.subheader("What-If Calculator")
-        st.success(
-            f"Updated ML prediction: **{current['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}**"
-        )
-        st.caption("SHAP + Bayesian summary")
+        if current.get("mode") == "what_if":
+            st.success(
+                f"Updated ML prediction: **{current['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}**"
+            )
+            st.caption("SHAP + Bayesian summary")
+            st.write(current["explanation"].get("natural_language", "No explanation available."))
+        else:
+            st.info("Run the What-If simulation from the sidebar to view results on this page.")
+
+    if selected_reasoning_tool == "Probabilistic Reasoning":
+        st.subheader("Probabilistic Reasoning")
+        if current.get("mode") == "bayesian":
+            bayesian_probs = current.get("explanation", {}).get("trace", {}).get("bayesian_probabilities", {})
+            if bayesian_probs:
+                ordered = ["balanced", "high_protein", "low_carb", "low_calorie"]
+                bayesian_df = pd.DataFrame(
+                    [{"Diet Class": diet, "Probability": bayesian_probs.get(diet, 0.0)} for diet in ordered]
+                )
+                top_diet = max(bayesian_probs.items(), key=lambda item: item[1])[0]
+                bayesian_df["Diet Class"] = bayesian_df["Diet Class"].map(
+                    lambda diet: f"⭐ {diet}" if diet == top_diet else diet
+                )
+                st.dataframe(
+                    bayesian_df.assign(Probability=bayesian_df["Probability"].map(lambda prob: f"{prob:.1%}")),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+                st.success(f"Highest probability class: **{top_diet.replace('_', ' ').title()}**")
+                st.write(current.get("explanation", {}).get("trace", {}).get("bayesian_explanation", ""))
+        else:
+            st.info("Run Probabilistic Reasoning from the sidebar to view Bayesian results on this page.")
+
+    if current.get("mode") == "what_if" and selected_reasoning_tool == "What-If Calculator":
+        st.subheader("Final Recommendation")
+        st.success(current["prediction"].get("diet_label", "n/a").replace("_", " ").title())
+
+        st.subheader("Explanation Summary")
         st.write(current["explanation"].get("natural_language", "No explanation available."))
 
-    if current.get("mode") == "bayesian":
-        st.subheader("Probabilistic Reasoning")
-        bayesian_probs = current.get("explanation", {}).get("trace", {}).get("bayesian_probabilities", {})
-        if bayesian_probs:
-            ordered = ["balanced", "high_protein", "low_carb", "low_calorie"]
-            bayesian_df = pd.DataFrame(
-                [{"Diet Class": diet, "Probability": bayesian_probs.get(diet, 0.0)} for diet in ordered]
+        comparison = current.get("comparison")
+        if comparison:
+            st.subheader("Comparison")
+            st.write(
+                f"**Before:** {comparison['original_prediction'].get('diet_label', 'n/a').replace('_', ' ').title()} | "
+                f"**After:** {current['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}"
             )
-            top_diet = max(bayesian_probs.items(), key=lambda item: item[1])[0]
-            bayesian_df["Diet Class"] = bayesian_df["Diet Class"].map(
-                lambda diet: f"⭐ {diet}" if diet == top_diet else diet
-            )
-            st.dataframe(
-                bayesian_df.assign(Probability=bayesian_df["Probability"].map(lambda prob: f"{prob:.1%}")),
-                use_container_width=True,
-                hide_index=True,
-            )
-            st.success(f"Highest probability class: **{top_diet.replace('_', ' ').title()}**")
-            st.write(current.get("explanation", {}).get("trace", {}).get("bayesian_explanation", ""))
-
-    st.subheader("Final Recommendation")
-    st.success(current["prediction"].get("diet_label", "n/a").replace("_", " ").title())
-
-    st.subheader("Explanation Summary")
-    st.write(current["explanation"].get("natural_language", "No explanation available."))
-
-    comparison = current.get("comparison")
-    if comparison:
-        st.subheader("Comparison")
-        st.write(
-            f"**Before:** {comparison['original_prediction'].get('diet_label', 'n/a').replace('_', ' ').title()} | "
-            f"**After:** {current['prediction'].get('diet_label', 'n/a').replace('_', ' ').title()}"
-        )
-        st.write(comparison["counterfactual_explanation"].get("human_readable", ""))
+            st.write(comparison["counterfactual_explanation"].get("human_readable", ""))
