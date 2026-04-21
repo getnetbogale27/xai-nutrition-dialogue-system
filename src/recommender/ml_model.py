@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import inspect
 from pathlib import Path
 from typing import Any
 
@@ -57,6 +58,18 @@ def _profile_to_feature_df(profile: Any) -> pd.DataFrame:
     )
 
 
+
+
+def _build_logistic_regression() -> LogisticRegression:
+    """Build a LogisticRegression model compatible across sklearn versions."""
+    candidate_params = {"max_iter": 1000, "multi_class": "auto"}
+    supported_params = inspect.signature(LogisticRegression).parameters
+    filtered_params = {
+        key: value for key, value in candidate_params.items() if key in supported_params
+    }
+    return LogisticRegression(**filtered_params)
+
+
 def train_model(dataset_path: Path = DATASET_PATH, model_path: Path = MODEL_PATH) -> dict[str, Any]:
     """Train and persist the logistic regression model."""
     df = pd.read_csv(dataset_path)
@@ -69,7 +82,7 @@ def train_model(dataset_path: Path = DATASET_PATH, model_path: Path = MODEL_PATH
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    model = LogisticRegression(max_iter=1000)
+    model = _build_logistic_regression()
     model.fit(X_train, y_train)
 
     predictions = model.predict(X_test)
