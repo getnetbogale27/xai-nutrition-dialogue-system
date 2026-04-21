@@ -25,6 +25,10 @@ def inject_professional_theme() -> None:
     st.markdown(
         """
         <style>
+            [data-testid="stSidebar"] {
+                background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+                border-right: 1px solid #e2e8f0;
+            }
             .block-container {padding-top: 1.5rem; padding-bottom: 2rem; max-width: 1200px;}
             .hero-card {
                 background: linear-gradient(120deg, #0f172a 0%, #1e293b 60%, #334155 100%);
@@ -39,6 +43,18 @@ def inject_professional_theme() -> None:
                 border: 1px solid #e2e8f0;
                 border-radius: 14px;
                 padding: 0.8rem 1rem;
+            }
+            .flow-step {
+                background: #ffffff;
+                border: 1px solid #dbeafe;
+                border-left: 4px solid #2563eb;
+                border-radius: 12px;
+                padding: 0.6rem 0.75rem;
+                margin-bottom: 0.55rem;
+            }
+            .flow-step-active {
+                border-left-color: #16a34a;
+                background: #f0fdf4;
             }
         </style>
         """,
@@ -72,6 +88,59 @@ def render_hero(title: str, subtitle: str) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def render_flow_sidebar(current_page: str) -> None:
+    """Render a structured top-down workflow guide in the sidebar."""
+    pages = [
+        (
+            "recommendation",
+            "Recommendation",
+            "app/pages/recommendation.py",
+            "Create or update a personalized plan.",
+            "1",
+        ),
+        (
+            "explanations",
+            "Explanations",
+            "app/pages/explanations.py",
+            "Inspect model reasoning and feature impact.",
+            "2",
+        ),
+        (
+            "dialogue",
+            "Dialogue",
+            "app/pages/dialogue.py",
+            "Ask follow-up what-if and trust-building questions.",
+            "3",
+        ),
+    ]
+
+    with st.sidebar:
+        st.markdown("## Guided Workflow")
+        st.caption("Move top → down for a focused and complete analysis.")
+
+        for slug, label, page_path, summary, order in pages:
+            is_active = slug == current_page
+            css_class = "flow-step flow-step-active" if is_active else "flow-step"
+            status = "✅ Current page" if is_active else "Next step"
+            st.markdown(
+                f"""
+                <div class="{css_class}">
+                    <div style="font-weight:700; color:#0f172a;">Step {order} · {label}</div>
+                    <div style="font-size:0.9rem; color:#334155;">{summary}</div>
+                    <div style="font-size:0.8rem; color:#64748b; margin-top:0.1rem;">{status}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.page_link(page_path, label=f"Open {label}", icon="➡️")
+
+        st.divider()
+        if not st.session_state.get("last_prediction"):
+            st.info("Start with Recommendation so later pages have complete context.")
+        else:
+            st.success("Context ready: recommendation data is available across pages.")
 
 
 def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str, bool]:

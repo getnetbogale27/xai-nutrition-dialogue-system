@@ -13,6 +13,7 @@ from app.ui_components import (
     initialize_state,
     inject_professional_theme,
     render_evaluation_strip,
+    render_flow_sidebar,
     render_hero,
     render_profile_controls,
     render_recommendation_summary,
@@ -22,6 +23,7 @@ from app.ui_components import (
 st.set_page_config(page_title="Recommendation", page_icon="📋", layout="wide")
 inject_professional_theme()
 initialize_state()
+render_flow_sidebar("recommendation")
 
 render_hero(
     "Recommendation Studio",

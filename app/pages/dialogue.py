@@ -13,12 +13,14 @@ from app.ui_components import (
     initialize_state,
     inject_professional_theme,
     render_chat_panel,
+    render_flow_sidebar,
     render_hero,
 )
 
 st.set_page_config(page_title="Dialogue", page_icon="💬", layout="wide")
 inject_professional_theme()
 initialize_state()
+render_flow_sidebar("dialogue")
 
 render_hero(
     "Interactive Dialogue",

@@ -14,12 +14,14 @@ from app.ui_components import (
     inject_professional_theme,
     profile_to_table,
     render_evaluation_strip,
+    render_flow_sidebar,
     render_hero,
 )
 
 st.set_page_config(page_title="XAI Nutrition Dialogue", page_icon="🥗", layout="wide")
 inject_professional_theme()
 initialize_state()
+render_flow_sidebar("home")
 
 render_hero(
     "XAI Nutrition Dialogue System",
@@ -53,13 +55,8 @@ link_cols[3].link_button(
     use_container_width=True,
 )
 
-st.markdown(
-    """
-    Use the left sidebar pages to work in a focused flow:
-    1. **Recommendation** → create or update a personalized plan.
-    2. **Explanations** → inspect model reasoning and feature impact.
-    3. **Dialogue** → ask follow-up what-if and trust-building questions.
-    """
+st.info(
+    "Use the guided sidebar flow from top to bottom: Recommendation → Explanations → Dialogue."
 )
 
 c1, c2 = st.columns([1, 1])
