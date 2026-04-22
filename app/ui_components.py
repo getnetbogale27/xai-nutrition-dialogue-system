@@ -575,6 +575,19 @@ def render_recommendation_summary() -> None:
         for idx, meal in enumerate(meal_ideas, start=1):
             st.markdown(f"{idx}. {meal}")
 
+    image_links = rec.get("food_image_links", [])
+    if image_links:
+        st.markdown("### Public Food Image References")
+        image_cols = st.columns(min(len(image_links), 2))
+        for idx, image_info in enumerate(image_links):
+            with image_cols[idx % len(image_cols)]:
+                st.image(
+                    image_info.get("url", ""),
+                    caption=f"{image_info.get('title', 'Food reference')} ({image_info.get('source', 'Public source')})",
+                    use_container_width=True,
+                )
+                st.markdown(f"[Open image link]({image_info.get('url', '')})")
+
 
 def render_explanation_panel() -> None:
     exp = st.session_state.last_explanation

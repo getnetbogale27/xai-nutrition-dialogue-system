@@ -100,6 +100,61 @@ def _personalization_message(profile: UserProfile) -> str:
     )
 
 
+def _food_image_links(label: str) -> list[dict[str, str]]:
+    """Return a small set of public food image URLs related to the diet label."""
+    links = {
+        "balanced": [
+            {
+                "title": "Mediterranean salad bowl",
+                "url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
+                "source": "Unsplash",
+            },
+            {
+                "title": "Healthy grain and veggie bowl",
+                "url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
+                "source": "Unsplash",
+            },
+        ],
+        "high_protein": [
+            {
+                "title": "Grilled salmon with greens",
+                "url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288",
+                "source": "Unsplash",
+            },
+            {
+                "title": "Protein-rich egg breakfast",
+                "url": "https://images.unsplash.com/photo-1482049016688-2d3e1b311543",
+                "source": "Unsplash",
+            },
+        ],
+        "low_carb": [
+            {
+                "title": "Zucchini noodle dish",
+                "url": "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327",
+                "source": "Unsplash",
+            },
+            {
+                "title": "Leafy salad with nuts",
+                "url": "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38",
+                "source": "Unsplash",
+            },
+        ],
+        "low_calorie": [
+            {
+                "title": "Vegetable soup bowl",
+                "url": "https://images.unsplash.com/photo-1547592166-23ac45744acd",
+                "source": "Unsplash",
+            },
+            {
+                "title": "Light fruit and smoothie spread",
+                "url": "https://images.unsplash.com/photo-1490645935967-10de6ba17061",
+                "source": "Unsplash",
+            },
+        ],
+    }
+    return links.get(label, links["balanced"])
+
+
 def generate_recommendation(profile: UserProfile, mode: str = "ml-based") -> dict:
     """Return recommendation payload for selected mode (`ml-based` default)."""
     mode = (mode or "ml-based").strip().lower()
@@ -113,6 +168,7 @@ def generate_recommendation(profile: UserProfile, mode: str = "ml-based") -> dic
             "recommendation_text": _label_to_text(label),
             "probabilities": {},
             "meal_ideas": meal_ideas,
+            "food_image_links": _food_image_links(label),
             "personalization_message": _personalization_message(profile),
         }
 
@@ -125,6 +181,7 @@ def generate_recommendation(profile: UserProfile, mode: str = "ml-based") -> dic
         "recommendation_text": _label_to_text(label),
         "probabilities": ml_result.get("probabilities", {}),
         "meal_ideas": meal_ideas,
+        "food_image_links": _food_image_links(label),
         "personalization_message": _personalization_message(profile),
         "ai_reasoning": {
             "top_probability": max(ml_result.get("probabilities", {}).values(), default=0.0),
