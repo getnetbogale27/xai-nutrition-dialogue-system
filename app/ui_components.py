@@ -278,6 +278,16 @@ def inject_professional_theme() -> None:
                 border-radius: 14px;
                 padding: 0.6rem 0.75rem;
             }
+            div[data-testid="stMetricLabel"] p {
+                font-size: 1rem;
+            }
+            div[data-testid="stMetricValue"] {
+                font-size: 2.15rem !important;
+                line-height: 1.2;
+            }
+            div[data-testid="stMetricValue"] > div {
+                font-size: inherit !important;
+            }
             div[data-testid="stDataFrame"] {
                 border: 1px solid #e2e8f0;
                 border-radius: 12px;
