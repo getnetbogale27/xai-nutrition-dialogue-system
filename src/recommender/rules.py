@@ -107,48 +107,40 @@ def _food_image_links(label: str) -> list[dict[str, str]]:
             {
                 "title": "Mediterranean salad bowl",
                 "url": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
-                "source": "Unsplash",
             },
             {
                 "title": "Healthy grain and veggie bowl",
                 "url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-                "source": "Unsplash",
             },
         ],
         "high_protein": [
             {
                 "title": "Grilled salmon with greens",
                 "url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288",
-                "source": "Unsplash",
             },
             {
                 "title": "Protein-rich egg breakfast",
                 "url": "https://images.unsplash.com/photo-1482049016688-2d3e1b311543",
-                "source": "Unsplash",
             },
         ],
         "low_carb": [
             {
                 "title": "Zucchini noodle dish",
                 "url": "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327",
-                "source": "Unsplash",
             },
             {
                 "title": "Leafy salad with nuts",
                 "url": "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38",
-                "source": "Unsplash",
             },
         ],
         "low_calorie": [
             {
                 "title": "Vegetable soup bowl",
                 "url": "https://images.unsplash.com/photo-1547592166-23ac45744acd",
-                "source": "Unsplash",
             },
             {
                 "title": "Light fruit and smoothie spread",
                 "url": "https://images.unsplash.com/photo-1490645935967-10de6ba17061",
-                "source": "Unsplash",
             },
         ],
     }
