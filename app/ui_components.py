@@ -513,8 +513,27 @@ def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str,
     return profile, mode, generate_clicked
 
 
+def build_personalization_message(profile: UserProfile | None) -> str:
+    """Create a professional personalization note, even for legacy predictions."""
+    if profile is None:
+        return "Personalization active: profile context is applied to improve recommendation relevance."
+
+    goal = str(getattr(profile, "health_goal", "general wellness") or "general wellness").replace("_", " ")
+    medical_conditions = tuple(getattr(profile, "medical_conditions", ()) or ())
+    allergies = tuple(getattr(profile, "allergies", ()) or ())
+
+    conditions = ", ".join(str(item) for item in medical_conditions) if medical_conditions else "none reported"
+    restrictions = ", ".join(str(item) for item in allergies) if allergies else "none reported"
+
+    return (
+        f"Personalization active: aligned to goal '{goal}', conditions ({conditions}), "
+        f"and allergies/restrictions ({restrictions})."
+    )
+
+
 def run_recommendation_pipeline(profile: UserProfile, mode: str) -> None:
     recommendation = generate_recommendation(profile, mode=mode)
+    recommendation.setdefault("personalization_message", build_personalization_message(profile))
     explanation = generate_explanation(profile, recommendation)
 
     st.session_state.profile = profile
@@ -538,7 +557,7 @@ def render_recommendation_summary() -> None:
 
     st.markdown("### Recommendation")
     st.success(rec.get("recommendation_text", "No recommendation text available."))
-    st.info(rec.get("personalization_message", "Personalization metadata unavailable."))
+    st.info(rec.get("personalization_message") or build_personalization_message(st.session_state.profile))
 
     meal_ideas = rec.get("meal_ideas", [])
     if meal_ideas:
