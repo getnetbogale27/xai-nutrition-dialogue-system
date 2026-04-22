@@ -66,34 +66,43 @@ st.markdown(
             font-size: 0.88rem;
         }
         .workspace-status li { margin-bottom: 0.28rem; }
-        div[role="radiogroup"][aria-label="Studio sections"] {
-            display: flex;
-            gap: 0.5rem;
-            margin: 0.2rem 0 1rem;
-            background: #f1f5f9;
+        .tab-intro {
             border: 1px solid #dbe4f0;
-            border-radius: 999px;
-            padding: 0.25rem;
-            width: fit-content;
+            border-radius: 14px;
+            background: #f8fafc;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.75rem;
         }
-        div[role="radiogroup"][aria-label="Studio sections"] label {
-            border-radius: 999px;
-            border: 1px solid transparent;
-            padding: 0.15rem 0.55rem;
-            background: transparent;
-        }
-        div[role="radiogroup"][aria-label="Studio sections"] label p {
-            font-size: 0.85rem;
-            font-weight: 600;
+        .tab-intro p {
+            margin: 0;
             color: #334155;
+            font-size: 0.88rem;
         }
-        div[role="radiogroup"][aria-label="Studio sections"] label[data-checked="true"] {
-            background: #ffffff;
-            border-color: #c7d2fe;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-        }
-        div[role="radiogroup"][aria-label="Studio sections"] label[data-checked="true"] p {
+        .section-note {
+            border-left: 4px solid #3b82f6;
+            background: #eff6ff;
+            border-radius: 10px;
+            padding: 0.65rem 0.8rem;
             color: #1e3a8a;
+            font-size: 0.84rem;
+            margin: 0.35rem 0 0.75rem;
+        }
+        div[data-baseweb="tab-list"] {
+            gap: 0.3rem;
+        }
+        button[data-baseweb="tab"] {
+            border-radius: 999px !important;
+            border: 1px solid #dbe4f0 !important;
+            background: #f8fafc !important;
+            padding: 0.2rem 0.75rem !important;
+            color: #334155 !important;
+            font-weight: 600 !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] {
+            background: #ffffff !important;
+            border-color: #c7d2fe !important;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.12) !important;
+            color: #1e3a8a !important;
         }
     </style>
     """,
@@ -120,14 +129,27 @@ with k4:
 
 st.divider()
 st.markdown('<h2 class="section-header">Recommendation Workspace</h2>', unsafe_allow_html=True)
-active_section = st.radio(
-    "Studio sections",
-    options=["🎛️ Studio", "📸 Live Snapshot", "📊 Evaluation"],
-    horizontal=True,
-    label_visibility="collapsed",
+st.markdown(
+    """
+    <div class="tab-intro">
+        <p>Use focused tabs to move from profile setup to final evaluation without excessive scrolling.</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+studio_tab, snapshot_tab, evaluation_tab = st.tabs(
+    ["🎛️ Studio Controls", "📸 Live Snapshot", "📊 Evaluation Dashboard"]
 )
 
-if active_section == "🎛️ Studio":
+with studio_tab:
+    st.markdown(
+        """
+        <div class="section-note">
+            Step 1: Configure patient details and run the recommendation pipeline. Step 2: Validate outputs in the next tab.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     workspace_left, workspace_right = st.columns([1.2, 1.0], vertical_alignment="top")
     with workspace_left:
         st.markdown(
@@ -169,7 +191,15 @@ if active_section == "🎛️ Studio":
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
-elif active_section == "📸 Live Snapshot":
+with snapshot_tab:
+    st.markdown(
+        """
+        <div class="section-note">
+            Live profile and recommendation state appear here for rapid clinical review and handoff readiness.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     overview_left, overview_right = st.columns([1.1, 1], vertical_alignment="top")
     with overview_left:
         st.markdown('<div class="panel-card"><div class="panel-title">Current Profile Snapshot</div>', unsafe_allow_html=True)
@@ -201,7 +231,15 @@ elif active_section == "📸 Live Snapshot":
             st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-else:
+with evaluation_tab:
+    st.markdown(
+        """
+        <div class="section-note">
+            Review system quality, user-feedback simulation, and trust metrics after each generated recommendation.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(
         """
         <div class="panel-card">
