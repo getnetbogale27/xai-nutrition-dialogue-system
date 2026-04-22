@@ -65,7 +65,7 @@ def inject_professional_theme() -> None:
                 padding: 1.05rem 1.15rem;
                 background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
                 box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-                min-height: 220px;
+                min-height: 0;
             }
             .explain-layout {
                 display: grid;
