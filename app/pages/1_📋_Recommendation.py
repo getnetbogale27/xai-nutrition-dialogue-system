@@ -66,6 +66,35 @@ st.markdown(
             font-size: 0.88rem;
         }
         .workspace-status li { margin-bottom: 0.28rem; }
+        div[role="radiogroup"][aria-label="Studio sections"] {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.2rem 0 1rem;
+            background: #f1f5f9;
+            border: 1px solid #dbe4f0;
+            border-radius: 999px;
+            padding: 0.25rem;
+            width: fit-content;
+        }
+        div[role="radiogroup"][aria-label="Studio sections"] label {
+            border-radius: 999px;
+            border: 1px solid transparent;
+            padding: 0.15rem 0.55rem;
+            background: transparent;
+        }
+        div[role="radiogroup"][aria-label="Studio sections"] label p {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        div[role="radiogroup"][aria-label="Studio sections"] label[data-checked="true"] {
+            background: #ffffff;
+            border-color: #c7d2fe;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+        div[role="radiogroup"][aria-label="Studio sections"] label[data-checked="true"] p {
+            color: #1e3a8a;
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -91,80 +120,94 @@ with k4:
 
 st.divider()
 st.markdown('<h2 class="section-header">Recommendation Workspace</h2>', unsafe_allow_html=True)
-workspace_left, workspace_right = st.columns([1.2, 1.0], vertical_alignment="top")
-with workspace_left:
-    st.markdown(
-        """
-        <div class="studio-shell">
-            <p class="studio-title">Workspace Controls</p>
-            <p class="studio-subtitle">Capture profile context, choose the engine, then run a personalized recommendation.</p>
-        """,
-        unsafe_allow_html=True,
-    )
-    profile, mode, generate_clicked = render_profile_controls("recommendation_page")
-    if generate_clicked:
-        run_recommendation_pipeline(profile, mode)
-        st.success("Recommendation pipeline completed successfully. Snapshot and evaluation panels updated.")
-    st.markdown("</div>", unsafe_allow_html=True)
+active_section = st.radio(
+    "Studio sections",
+    options=["🎛️ Studio", "📸 Live Snapshot", "📊 Evaluation"],
+    horizontal=True,
+    label_visibility="collapsed",
+)
 
-with workspace_right:
-    st.markdown(
-        """
-        <div class="studio-shell">
-            <p class="studio-title">Decision Output</p>
-            <p class="studio-subtitle">Review generated diet pathway and confidence signals in real time.</p>
-        """,
-        unsafe_allow_html=True,
-    )
-    render_recommendation_summary()
-    st.markdown(
-        """
-        <div class="workspace-status">
-            <h4>Recommended workflow</h4>
-            <ul>
-                <li>Complete profile fields with realistic patient context.</li>
-                <li>Select ML for probabilistic guidance or Rule-based for deterministic logic.</li>
-                <li>Generate recommendation and validate outcomes in Live Snapshot.</li>
-            </ul>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
-
-st.divider()
-st.markdown('<h2 class="section-header">Live Snapshot</h2>', unsafe_allow_html=True)
-overview_left, overview_right = st.columns([1.1, 1], vertical_alignment="top")
-with overview_left:
-    st.markdown('<div class="panel-card"><div class="panel-title">Current Profile Snapshot</div>', unsafe_allow_html=True)
-    profile_df = profile_to_table()
-    if profile_df.empty:
-        st.info("No active patient profile yet. Configure the patient profile to activate real-time tracking.")
-    else:
-        st.dataframe(profile_df, use_container_width=True, hide_index=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with overview_right:
-    st.markdown('<div class="panel-card"><div class="panel-title">Current Recommendation Snapshot</div>', unsafe_allow_html=True)
-    if rec:
+if active_section == "🎛️ Studio":
+    workspace_left, workspace_right = st.columns([1.2, 1.0], vertical_alignment="top")
+    with workspace_left:
         st.markdown(
-            f"""
-            <span class="stat-chip">Diet: {rec.get("diet_label", "n/a").replace("_", " ").title()}</span>
-            <span class="stat-chip">Engine: {rec.get("mode", "unknown").replace("-", " ").title()}</span>
-            <span class="stat-chip">Confidence: {confidence:.1%}</span>
+            """
+            <div class="studio-shell">
+                <p class="studio-title">Workspace Controls</p>
+                <p class="studio-subtitle">Capture profile context, choose the engine, then run a personalized recommendation.</p>
             """,
             unsafe_allow_html=True,
         )
-        st.markdown("#### Clinical Guidance")
-        st.success(rec.get("recommendation_text", ""))
-        st.caption(
-            rec.get("personalization_message")
-            or build_personalization_message(st.session_state.profile)
-        )
-    else:
-        st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
-    st.markdown("</div>", unsafe_allow_html=True)
+        profile, mode, generate_clicked = render_profile_controls("recommendation_page")
+        if generate_clicked:
+            run_recommendation_pipeline(profile, mode)
+            st.success("Recommendation pipeline completed successfully. Snapshot and evaluation panels updated.")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-st.divider()
-st.markdown('<h2 class="section-header">Evaluation Overview</h2>', unsafe_allow_html=True)
-render_evaluation_strip()
+    with workspace_right:
+        st.markdown(
+            """
+            <div class="studio-shell">
+                <p class="studio-title">Decision Output</p>
+                <p class="studio-subtitle">Review generated diet pathway and confidence signals in real time.</p>
+            """,
+            unsafe_allow_html=True,
+        )
+        render_recommendation_summary()
+        st.markdown(
+            """
+            <div class="workspace-status">
+                <h4>Recommended workflow</h4>
+                <ul>
+                    <li>Complete profile fields with realistic patient context.</li>
+                    <li>Select ML for probabilistic guidance or Rule-based for deterministic logic.</li>
+                    <li>Generate recommendation and validate outcomes in Live Snapshot.</li>
+                </ul>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+elif active_section == "📸 Live Snapshot":
+    overview_left, overview_right = st.columns([1.1, 1], vertical_alignment="top")
+    with overview_left:
+        st.markdown('<div class="panel-card"><div class="panel-title">Current Profile Snapshot</div>', unsafe_allow_html=True)
+        profile_df = profile_to_table()
+        if profile_df.empty:
+            st.info("No active patient profile yet. Configure the patient profile to activate real-time tracking.")
+        else:
+            st.dataframe(profile_df, use_container_width=True, hide_index=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with overview_right:
+        st.markdown('<div class="panel-card"><div class="panel-title">Current Recommendation Snapshot</div>', unsafe_allow_html=True)
+        if rec:
+            st.markdown(
+                f"""
+                <span class="stat-chip">Diet: {rec.get("diet_label", "n/a").replace("_", " ").title()}</span>
+                <span class="stat-chip">Engine: {rec.get("mode", "unknown").replace("-", " ").title()}</span>
+                <span class="stat-chip">Confidence: {confidence:.1%}</span>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.markdown("#### Clinical Guidance")
+            st.success(rec.get("recommendation_text", ""))
+            st.caption(
+                rec.get("personalization_message")
+                or build_personalization_message(st.session_state.profile)
+            )
+        else:
+            st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+else:
+    st.markdown(
+        """
+        <div class="panel-card">
+            <div class="panel-title">Evaluation Overview</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    render_evaluation_strip()
+    st.markdown("</div>", unsafe_allow_html=True)
