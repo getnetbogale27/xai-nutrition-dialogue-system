@@ -109,7 +109,7 @@ class NutritionChatbot:
 
         response = (
             "I can explain your recommendation, compare what happens if sugar is reduced, "
-            "or provide a simple-language summary."
+            "provide a simple-language summary, and reference your personalized restrictions."
         )
         self._remember(question, response, recommendation)
         return response
