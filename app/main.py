@@ -100,53 +100,54 @@ def show_recommendation() -> None:
 
     st.divider()
     st.markdown('<h2 class="section-header">Recommendation Workspace</h2>', unsafe_allow_html=True)
-    left, right = st.columns([1.05, 1.15])
-    with left:
-        profile, mode, generate_clicked = render_profile_controls("recommendation_page")
-        if generate_clicked:
-            run_recommendation_pipeline(profile, mode)
-            st.success("Recommendation pipeline completed successfully. Snapshot and evaluation panels updated.")
+    tab_studio, tab_snapshot, tab_evaluation = st.tabs(
+        ["🎛️ Studio Controls", "📸 Live Snapshot", "📊 Evaluation Dashboard"]
+    )
 
-    with right:
-        render_recommendation_summary()
+    with tab_studio:
+        left, right = st.columns([1.05, 1.15])
+        with left:
+            profile, mode, generate_clicked = render_profile_controls("recommendation_page")
+            if generate_clicked:
+                run_recommendation_pipeline(profile, mode)
+                st.success("Recommendation pipeline completed successfully. Snapshot and evaluation panels updated.")
 
+        with right:
+            render_recommendation_summary()
 
-    st.divider()
-    st.markdown('<h2 class="section-header">Live Snapshot</h2>', unsafe_allow_html=True)
-    overview_left, overview_right = st.columns([1.1, 1])
-    with overview_left:
-        st.markdown('<div class="panel-card"><div class="panel-title">Current Profile Snapshot</div>', unsafe_allow_html=True)
-        profile_df = profile_to_table()
-        if profile_df.empty:
-            st.info("No active patient profile yet. Configure the patient profile to activate real-time tracking.")
-        else:
-            st.dataframe(profile_df, use_container_width=True, hide_index=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    with tab_snapshot:
+        overview_left, overview_right = st.columns([1.1, 1])
+        with overview_left:
+            st.markdown('<div class="panel-card"><div class="panel-title">Current Profile Snapshot</div>', unsafe_allow_html=True)
+            profile_df = profile_to_table()
+            if profile_df.empty:
+                st.info("No active patient profile yet. Configure the patient profile to activate real-time tracking.")
+            else:
+                st.dataframe(profile_df, use_container_width=True, hide_index=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    with overview_right:
-        st.markdown(
-            '<div class="panel-card"><div class="panel-title">Current Recommendation Snapshot</div>',
-            unsafe_allow_html=True,
-        )
-        if rec:
+        with overview_right:
             st.markdown(
-                f"""
-                <span class="stat-chip">Diet: {rec.get('diet_label', 'n/a').replace('_', ' ').title()}</span>
-                <span class="stat-chip">Engine: {rec.get('mode', 'unknown').replace('-', ' ').title()}</span>
-                <span class="stat-chip">Confidence: {confidence:.1%}</span>
-                """,
+                '<div class="panel-card"><div class="panel-title">Current Recommendation Snapshot</div>',
                 unsafe_allow_html=True,
             )
-            st.markdown("#### Clinical Guidance")
-            st.success(rec.get("recommendation_text", ""))
-        else:
-            st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
-        st.markdown("</div>", unsafe_allow_html=True)
+            if rec:
+                st.markdown(
+                    f"""
+                    <span class="stat-chip">Diet: {rec.get('diet_label', 'n/a').replace('_', ' ').title()}</span>
+                    <span class="stat-chip">Engine: {rec.get('mode', 'unknown').replace('-', ' ').title()}</span>
+                    <span class="stat-chip">Confidence: {confidence:.1%}</span>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                st.markdown("#### Clinical Guidance")
+                st.success(rec.get("recommendation_text", ""))
+            else:
+                st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
+            st.markdown("</div>", unsafe_allow_html=True)
 
-
-    st.divider()
-    st.markdown('<h2 class="section-header">Evaluation Overview</h2>', unsafe_allow_html=True)
-    render_evaluation_strip()
+    with tab_evaluation:
+        render_evaluation_strip()
 
 
 def show_explanations() -> None:
