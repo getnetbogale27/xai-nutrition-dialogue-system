@@ -520,6 +520,8 @@ def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str,
     }
     accepted_fields = set(inspect.signature(UserProfile).parameters)
     profile = UserProfile(**{key: value for key, value in profile_kwargs.items() if key in accepted_fields})
+    st.session_state.current_draft_profile = profile
+    st.session_state.current_draft_mode = mode
     return profile, mode, generate_clicked
 
 
@@ -568,6 +570,13 @@ def render_recommendation_summary() -> None:
     st.markdown("### Recommendation")
     st.success(rec.get("recommendation_text", "No recommendation text available."))
     st.info(rec.get("personalization_message") or build_personalization_message(st.session_state.profile))
+    draft_profile = st.session_state.get("current_draft_profile")
+    generated_profile = st.session_state.get("profile")
+    if draft_profile is not None and generated_profile is not None and draft_profile != generated_profile:
+        st.warning(
+            "Form values changed since the last generation. The recommendation summary reflects the previous run. "
+            "Click **Generate Personalized Recommendation** to refresh."
+        )
 
     meal_ideas = rec.get("meal_ideas", [])
     if meal_ideas:
