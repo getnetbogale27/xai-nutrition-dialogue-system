@@ -98,6 +98,20 @@ def show_recommendation() -> None:
     with k4:
         render_kpi_card("Evaluated Profiles", "1" if st.session_state.profile else "0")
 
+    st.divider()
+    st.markdown('<h2 class="section-header">Recommendation Workspace</h2>', unsafe_allow_html=True)
+    left, right = st.columns([1.05, 1.15])
+    with left:
+        profile, mode, generate_clicked = render_profile_controls("recommendation_page")
+        if generate_clicked:
+            run_recommendation_pipeline(profile, mode)
+            st.success("Recommendation pipeline completed successfully. Snapshot and evaluation panels updated.")
+
+    with right:
+        render_recommendation_summary()
+
+
+    st.divider()
     st.markdown('<h2 class="section-header">Live Snapshot</h2>', unsafe_allow_html=True)
     overview_left, overview_right = st.columns([1.1, 1])
     with overview_left:
@@ -129,17 +143,6 @@ def show_recommendation() -> None:
             st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.divider()
-    st.markdown('<h2 class="section-header">Recommendation Workspace</h2>', unsafe_allow_html=True)
-    left, right = st.columns([1.05, 1.15])
-    with left:
-        profile, mode, generate_clicked = render_profile_controls("recommendation_page")
-        if generate_clicked:
-            run_recommendation_pipeline(profile, mode)
-            st.success("Recommendation pipeline completed successfully. Snapshot and evaluation panels updated.")
-
-    with right:
-        render_recommendation_summary()
 
     st.divider()
     st.markdown('<h2 class="section-header">Evaluation Overview</h2>', unsafe_allow_html=True)
