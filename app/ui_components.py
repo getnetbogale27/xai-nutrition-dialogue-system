@@ -452,6 +452,27 @@ def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str,
             "Activity Level", ["low", "medium", "high"], key=f"{key_prefix}_activity"
         )
         sugar = c4.selectbox("Sugar Preference", ["low", "high"], key=f"{key_prefix}_sugar")
+        health_goal = st.selectbox(
+            "Primary Health Goal",
+            ["general_wellness", "weight_loss", "muscle_gain", "blood_sugar_control"],
+            format_func=lambda value: value.replace("_", " ").title(),
+            key=f"{key_prefix}_health_goal",
+        )
+        conditions = st.multiselect(
+            "Medical Conditions (for personalization safety)",
+            ["diabetes", "hypertension", "pcos", "high_cholesterol"],
+            key=f"{key_prefix}_conditions",
+        )
+        allergies_text = st.text_input(
+            "Allergies (comma separated, e.g., peanut, shellfish)",
+            value="",
+            key=f"{key_prefix}_allergies",
+        )
+        excluded_foods_text = st.text_input(
+            "Foods to Avoid (comma separated, e.g., beef, dairy)",
+            value="",
+            key=f"{key_prefix}_excluded_foods",
+        )
 
         model_choice = st.radio(
             "Recommendation Engine",
@@ -479,6 +500,12 @@ def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str,
         activity_level=activity,
         dietary_preference="balanced",
         sugar_preference=sugar,
+        health_goal=health_goal,
+        allergies=tuple(part.strip().lower() for part in allergies_text.split(",") if part.strip()),
+        excluded_foods=tuple(
+            part.strip().lower() for part in excluded_foods_text.split(",") if part.strip()
+        ),
+        medical_conditions=tuple(condition.replace("_", " ") for condition in conditions),
     )
     return profile, mode, generate_clicked
 
@@ -508,6 +535,13 @@ def render_recommendation_summary() -> None:
 
     st.markdown("### Recommendation")
     st.success(rec.get("recommendation_text", "No recommendation text available."))
+    st.info(rec.get("personalization_message", "Personalization metadata unavailable."))
+
+    meal_ideas = rec.get("meal_ideas", [])
+    if meal_ideas:
+        st.markdown("### Personalized Meal Ideas")
+        for idx, meal in enumerate(meal_ideas, start=1):
+            st.markdown(f"{idx}. {meal}")
 
 
 def render_explanation_panel() -> None:

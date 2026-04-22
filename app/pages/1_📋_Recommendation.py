@@ -65,6 +65,12 @@ with overview_right:
         )
         st.markdown("#### Clinical Guidance")
         st.success(rec.get("recommendation_text", ""))
+        st.caption(
+            rec.get(
+                "personalization_message",
+                "Personalization is enabled to avoid one-size-fits-all meal advice.",
+            )
+        )
     else:
         st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
     st.markdown("</div>", unsafe_allow_html=True)
