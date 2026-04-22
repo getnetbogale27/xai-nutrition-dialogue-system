@@ -24,8 +24,11 @@ def test_recommendation_includes_personalization_fields():
 
     assert "personalization_message" in result
     assert "meal_ideas" in result
+    assert "food_image_links" in result
     assert isinstance(result["meal_ideas"], list)
+    assert isinstance(result["food_image_links"], list)
     assert result["meal_ideas"]
+    assert result["food_image_links"]
     assert "one-size-fits-all" not in result["recommendation_text"].lower()
 
 
