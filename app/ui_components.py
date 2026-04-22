@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from dataclasses import asdict
 from html import escape
 import re
@@ -494,19 +495,21 @@ def render_profile_controls(key_prefix: str = "main") -> tuple[UserProfile, str,
             key=f"{key_prefix}_generate",
         )
 
-    profile = UserProfile(
-        age=int(age),
-        weight=float(weight),
-        activity_level=activity,
-        dietary_preference="balanced",
-        sugar_preference=sugar,
-        health_goal=health_goal,
-        allergies=tuple(part.strip().lower() for part in allergies_text.split(",") if part.strip()),
-        excluded_foods=tuple(
+    profile_kwargs = {
+        "age": int(age),
+        "weight": float(weight),
+        "activity_level": activity,
+        "dietary_preference": "balanced",
+        "sugar_preference": sugar,
+        "health_goal": health_goal,
+        "allergies": tuple(part.strip().lower() for part in allergies_text.split(",") if part.strip()),
+        "excluded_foods": tuple(
             part.strip().lower() for part in excluded_foods_text.split(",") if part.strip()
         ),
-        medical_conditions=tuple(condition.replace("_", " ") for condition in conditions),
-    )
+        "medical_conditions": tuple(condition.replace("_", " ") for condition in conditions),
+    }
+    accepted_fields = set(inspect.signature(UserProfile).parameters)
+    profile = UserProfile(**{key: value for key, value in profile_kwargs.items() if key in accepted_fields})
     return profile, mode, generate_clicked
 
 
