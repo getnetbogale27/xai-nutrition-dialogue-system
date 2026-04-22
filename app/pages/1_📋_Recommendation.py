@@ -11,6 +11,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from app.ui_components import (
     initialize_state,
+    build_personalization_message,
     inject_professional_theme,
     profile_to_table,
     render_evaluation_strip,
@@ -157,10 +158,8 @@ with overview_right:
         st.markdown("#### Clinical Guidance")
         st.success(rec.get("recommendation_text", ""))
         st.caption(
-            rec.get(
-                "personalization_message",
-                "Personalization is enabled to avoid one-size-fits-all meal advice.",
-            )
+            rec.get("personalization_message")
+            or build_personalization_message(st.session_state.profile)
         )
     else:
         st.info("No recommendation generated yet. Complete the profile and run the recommendation engine.")
